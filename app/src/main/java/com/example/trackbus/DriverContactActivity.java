@@ -91,7 +91,7 @@ public class DriverContactActivity extends AppCompatActivity implements OnMapRea
         if (gmap == null) return;
 
         if (LocationMarker == null) {
-            LocationMarker = gmap.addMarker(new MarkerOptions().position(ownlocation).title("Bus Track"));
+            LocationMarker = gmap.addMarker(new MarkerOptions().position(ownlocation).title("My Office of Bus Track App"));
         }else{
             LocationMarker.setPosition(ownlocation);
         }
