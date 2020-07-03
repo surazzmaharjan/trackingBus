@@ -82,6 +82,7 @@ public class PassengerProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent mainIntent = new Intent(PassengerProfileActivity.this, PassengerActivity.class);
                 startActivity(mainIntent);
+                finish();
             }
         });
 

@@ -83,6 +83,7 @@ public class ProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent mainIntent = new Intent(ProfileActivity.this, DriverActivity.class);
                 startActivity(mainIntent);
+                finish();
             }
         });
 

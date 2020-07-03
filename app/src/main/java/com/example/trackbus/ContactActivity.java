@@ -44,6 +44,8 @@ public class ContactActivity extends AppCompatActivity  implements OnMapReadyCal
             public void onClick(View v) {
                 Intent mainIntent = new Intent(ContactActivity.this, PassengerActivity.class);
                 startActivity(mainIntent);
+                finish();
+
             }
         });
 

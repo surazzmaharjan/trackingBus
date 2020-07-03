@@ -42,6 +42,7 @@ public class DriverContactActivity extends AppCompatActivity implements OnMapRea
             public void onClick(View v) {
                 Intent mainIntent = new Intent(DriverContactActivity.this, DriverActivity.class);
                 startActivity(mainIntent);
+                finish();
             }
         });
 
