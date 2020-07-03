@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/eta"
+            android:title="@string/get_eta"
+            android:icon="@mipmap/ic_schedule_black_24dp"/>
+        <item
+            android:id="@+id/link_bus"
+            android:title="@string/Link_bus"
+            android:icon="@mipmap/ic_directions_bus_black_24dp"/>
+
+        <item
+            android:id="@+id/request_wait"
+            android:title="@string/request_wait"
+            android:icon="@mipmap/ic_pan_tool_black_24dp"/>
+
+
+
+    </group>
+
+    <item android:title="General Settings">
+        <menu>
+            <item
+                android:id="@+id/passengerprofile"
+                android:title="Profile"
+                android:icon="@drawable/ic_baseline_person_pin_24"/>
+
+            c<item
+                android:id="@+id/passenger_contactus"
+                android:icon="@drawable/ic_baseline_contact_phone_24"
+                android:title="Contact Us" />
+
+            <item
+                android:id="@+id/logout"
+                android:title="@string/logout"
+                android:icon="@mipmap/ic_account_circle_black_24dp"/>
+
+        </menu>
+    </item>
+</menu>

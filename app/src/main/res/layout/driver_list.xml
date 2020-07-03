@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+
+    android:id="@+id/card_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    card_view:cardElevation="2dp"
+    card_view:cardCornerRadius="5dp"
+    card_view:cardMaxElevation="2dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp">
+
+        <TextView
+            android:id="@+id/tvemail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="Email"
+            android:textStyle="bold"
+            android:textColor="@color/textBlack"
+            android:textSize="20dp" />
+        <TextView
+            android:id="@+id/driveremail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvemail"
+            android:padding="5dp"
+            android:text="lastname"
+            android:textColor="@color/textBlack"
+            android:textSize="20dp" />
+
+
+
+        <ImageView
+            android:id="@+id/btnonline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/online_flag"
+            android:padding="5dp" />
+
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

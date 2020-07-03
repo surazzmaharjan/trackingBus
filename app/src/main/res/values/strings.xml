@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name">trackBus</string>
+
+    <string-array name="choose">
+        <item>Driver</item>
+        <item>Passenger</item>
+    </string-array>
+    <string name="isDriver">is_driver</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="password">Password</string>
+
+    <string name="gps_dialog_title">GPS...</string>
+    <string name="gps_enable_message"><![CDATA[GPS is not enable, Please enable it in next window.<br>]]></string>
+
+
+    <string name="title_activity_driver_maps">Map</string>
+    <string name="title_activity_student_maps">Map</string>
+    <string name="get_eta">Get ETA</string>
+    <string name="ReadyToGo">Ready to go</string>
+    <string name="logout">Logout</string>
+    <string name="request_wait">Request Wait</string>
+    <string name="locate_bus">Find nearest bus</string>
+    <string name="selectBusTitle">Whats your bus no?</string>
+    <string name="ok">OK</string>
+
+    <string name="Link_bus">Link Bus</string>
+
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="passenger_maps_first_time_launch">passenger_maps_first_time_launch</string>
+    <string name="bus_no">bus_no</string>
+    <string name="channel_name">channel_01</string>
+    <string name="enable_gps">Enable GPS</string>
+    <string name="cancel">Cancel</string>
+    <string name="channel_description">Notification channel for showing notification for waiting request from passenger.</string>
+    <string name="request_wait_notification">A Passenger nearby is requesting you to wait.</string>
+    <string name="launched_via_notification">launch_via_notification</string>
+
+    <string-array name="bus_numbers">
+        <item>2</item>
+        <item>8</item>
+        <item>1</item>
+        <item>4</item>
+    </string-array>
+
+
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
+        AIzaSyD8uwIaSCILi18aEa_i4ryOE5MJQrIdvDA</string>
+</resources>

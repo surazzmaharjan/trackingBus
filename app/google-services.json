@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "208091092178",
+    "firebase_url": "https://bustrack-e4fca.firebaseio.com",
+    "project_id": "bustrack-e4fca",
+    "storage_bucket": "bustrack-e4fca.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:208091092178:android:344d1d43036bd6f7f8890b",
+        "android_client_info": {
+          "package_name": "com.example.trackbus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "208091092178-4tptsg32259iqrqhepounlm803bi9ruc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.trackbus",
+            "certificate_hash": "1049784d31ebae406de2750da9d88d8584f6e3a1"
+          }
+        },
+        {
+          "client_id": "208091092178-l9pm6unt02tlhfq3egnab50vfhvsbecu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIqoB_jGBhQV5woXPa-D42DldhsOXQScw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "208091092178-l9pm6unt02tlhfq3egnab50vfhvsbecu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

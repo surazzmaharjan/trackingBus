@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/profile"
+            android:title="Profile"
+            android:icon="@drawable/ic_baseline_person_pin_24"/>
+        <item
+            android:id="@+id/link_bus"
+            android:title="Link Bus"
+            android:icon="@mipmap/ic_directions_bus_black_24dp"/>
+
+
+        <item
+            android:id="@+id/driver_contactus"
+            android:icon="@drawable/ic_baseline_contact_phone_24"
+            android:title="Contact Us" />
+
+        <item
+            android:id="@+id/logout"
+            android:title="Logout"
+            android:icon="@mipmap/ic_account_circle_black_24dp"/>
+
+    </group>
+
+</menu>
