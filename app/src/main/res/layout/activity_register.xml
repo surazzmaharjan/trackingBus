@@ -30,7 +30,7 @@
                 android:layout_height="100dp"
                 android:scaleType="fitCenter"
                 android:layout_gravity="center_horizontal"
-                android:src="@drawable/register" />
+                android:src="@drawable/transport" />
 
             <TextView
                 android:layout_width="match_parent"

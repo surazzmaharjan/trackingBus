@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.example.trackbus.model.User;
 import com.example.trackbus.service.BusTrackNotification;
 import com.example.trackbus.validation.InputValidation;
+import com.facebook.login.LoginManager;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -51,7 +52,7 @@ public class ProfileActivity extends AppCompatActivity {
     private TextInputEditText textInputEditTextFullNameUpdate;
     private TextInputEditText textInputEditTextprofessionUpdate;
     private TextInputEditText textInputEditTextPlaceUpdate;
-    private TextInputEditText textInputEditTextPhoneUpdate;
+    private  TextInputEditText textInputEditTextPhoneUpdate;
 
     private TextView textViewemail;
     private TextView textViewusertype;
@@ -211,6 +212,7 @@ public class ProfileActivity extends AppCompatActivity {
 
             case R.id.actionlogout:
                 displayNotification();
+//                LoginManager.getInstance().logOut();
                 FirebaseAuth.getInstance().signOut();
                 SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
                 editor.remove(getString(R.string.isDriver));

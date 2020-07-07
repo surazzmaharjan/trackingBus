@@ -30,11 +30,14 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.trackbus.service.BusTrackNotification;
+import com.facebook.FacebookSdk;
+import com.facebook.login.LoginManager;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.common.ConnectionResult;
@@ -56,6 +59,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 import java.util.Map;
@@ -67,11 +71,12 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
 
 
+
     @BindView(R.id.logout_btn_driver)
     Button mLogout;
 
-    @BindView(R.id.profile)
-    Button mProfile;
+//    @BindView(R.id.profile)
+//    Button mProfile;
 
     @BindView(R.id.link_bus)
     Button mLinkBus;
@@ -99,13 +104,15 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     double passengerLocationLat = 0;
     double passengerLocationLon = 0;
     private Marker mPassengerMarker;
-    private TextView useremail;
+    private TextView useremail ,userfullname;
+    private ImageView profileimage;
 
     private FirebaseAuth mAuth;
 
      NotificationManager mNotificationManager;
 
     NotificationManagerCompat notificationManagerCompat;
+
 
     @Override
     protected void onStop() {
@@ -141,7 +148,6 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         //First check if GPS is enabled
         turnGPSOn();
 
-
         notificationManagerCompat= NotificationManagerCompat.from(this);
         BusTrackNotification channel = new BusTrackNotification(this);
         channel.createNotificationChannel();
@@ -160,11 +166,21 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         /*View view=navigationView.inflateHeaderView(R.layout.nav_header_main);*/
 
         useremail = header.findViewById(R.id.navemail);
+//        profileimage = header.findViewById(R.id.profile_img);
+//        userfullname = header.findViewById(R.id.navfullname);
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        useremail.setText(currentUser.getEmail());
 
+        useremail.setText(currentUser.getEmail());
+//        userfullname.setText(currentUser.getDisplayName());
+////        Log.d("cuser",currentUser.getDisplayName());
+//        if(currentUser.getPhotoUrl()!=null){
+//            String photoUrl = currentUser.getPhotoUrl().toString();
+//            photoUrl = photoUrl+ "?type=large";
+//
+//            Picasso.get().load(photoUrl).into(profileimage);
+//        }
 
         mNotificationManager= (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -349,16 +365,16 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 switch (i) {
                                     case 0:
-                                        bus_num = 2;
+                                        bus_num = 1111;
                                         break;
                                     case 1:
-                                        bus_num = 8;
+                                        bus_num = 2222;
                                         break;
                                     case 2:
-                                        bus_num = 1;
+                                        bus_num = 3333;
                                         break;
                                     case 3:
-                                        bus_num = 4;
+                                        bus_num = 4444;
                                         break;
 
                                 }
@@ -371,6 +387,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                 break;
             case R.id.logout:
                 displayNotification();
+//                LoginManager.getInstance().logOut();
                 FirebaseAuth.getInstance().signOut();
                 SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
                 editor.remove(getString(R.string.isDriver));
@@ -432,7 +449,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         Log.e(LOG_TAG, "Latitude and longitude are : " + latLng);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("driver_available");
@@ -485,4 +502,6 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
         notificationManagerCompat.notify(1, notification);
     }
+
+
 }

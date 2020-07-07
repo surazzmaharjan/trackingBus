@@ -9,16 +9,21 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
 import android.app.Notification;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationManager;
+import android.media.RingtoneManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -26,10 +31,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 
 import com.example.trackbus.service.BusTrackNotification;
 import com.firebase.geofire.GeoFire;
@@ -59,8 +66,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -75,7 +84,8 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
     @BindView(R.id.nav_view_passenger)
     NavigationView mNavigationView;
 
-
+    public double buslat = 0;
+    public  double buslon = 0;
 
     @BindView(R.id.locate_bus_fab)
     FloatingActionButton locateBus;
@@ -110,9 +120,11 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
     private SharedPreferences prefs;
     private Marker mBusMarker;
     private ProgressBar spinner;
-    private TextView useremail;
+    private TextView useremail,userfullname;
+    private ImageView profileimage;
 
-
+    float estimatedDriveTimeInMinutes;
+    int durationtime,distanceMeter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,10 +144,26 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
 
         View header=mNavigationView.getHeaderView(0);
         useremail = header.findViewById(R.id.navemail);
+//        profileimage = header.findViewById(R.id.profile_img);
+//        userfullname = header.findViewById(R.id.navfullname);
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
+
         useremail.setText(currentUser.getEmail());
+//        userfullname.setText(currentUser.getDisplayName());
+
+
+//        if(currentUser.getPhotoUrl()!=null){
+//            String photoUrl = currentUser.getPhotoUrl().toString();
+//            photoUrl = photoUrl+ "?type=large";
+//
+////            Log.d("cuser",photoUrl);
+//
+//            Picasso.get().load(photoUrl).into(profileimage);
+//        }
+//
+
 
 
         notificationManagerCompat= NotificationManagerCompat.from(this);
@@ -173,16 +201,16 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
                         public void onClick(DialogInterface dialogInterface, int i) {
                             switch (i) {
                                 case 0:
-                                    bus_num = 2;
+                                    bus_num = 1111;
                                     break;
                                 case 1:
-                                    bus_num = 8;
+                                    bus_num = 2222;
                                     break;
                                 case 2:
-                                    bus_num = 1;
+                                    bus_num = 3333;
                                     break;
                                 case 3:
-                                    bus_num = 4;
+                                    bus_num = 4444;
                                     break;
 
                             }
@@ -235,27 +263,38 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
                     Toast.makeText(PassengerActivity.this, "Sorry, Your driver is not online!", Toast.LENGTH_LONG).show();
                     return;
                 }
+//
+//                final String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//                final DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("request_eta");
+//                GeoFire geoFire = new GeoFire(reference);
+//                geoFire.setLocation(uid, new GeoLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
+//
                 DatabaseReference busLocation = FirebaseDatabase.getInstance().getReference().child("driver_available").child(busDriverKey).child("l");
                 busLocation.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()){
                             List<Object> map = (List<Object>)dataSnapshot.getValue();
-                            double lat = 0;
-                            double lon = 0;
+
                             if (map.get(0) != null){
-                                lat = Double.parseDouble(map.get(0).toString());
+                                buslat = Double.parseDouble(map.get(0).toString());
                             }
 
                             if (map.get(1) != null){
-                                lon = Double.parseDouble(map.get(1).toString());
+                                buslon = Double.parseDouble(map.get(1).toString());
                             }
 
-                            LatLng busLocation = new LatLng(lat, lon);
+                            LatLng busLocation = new LatLng(buslat, buslon);
+
+
                             if (mBusMarker != null) mBusMarker.remove();
                             mBusMarker = mMap.addMarker(new MarkerOptions().position(busLocation).title("Your bus here"));
 
+//                            Log.d("far",distance(buslat,buslon,'K')+" Kilometers far away");
+                            Log.d("far",distance(buslat,buslon,'M')+" Miles far away");
+
                         }
+
                     }
 
                     @Override
@@ -292,11 +331,24 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
 
 
                     case R.id.eta:
-                        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("request_eta");
-                        GeoFire geoFire = new GeoFire(reference);
-                        geoFire.setLocation(uid, new GeoLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
-                        // getDriverLocation();
+
+                        if(buslat ==0 && buslon==0){
+                            displayNotification2();
+
+                        }else {
+                            CalculationByDistance(buslat, buslon);
+                            displayNotification1();
+                        }
+//                        final String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//                       final DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("request_eta");
+//                        GeoFire geoFire = new GeoFire(reference);
+//                        geoFire.setLocation(uid, new GeoLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
+//                        etaLocation = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+
+//                        mMap.addMarker(new MarkerOptions().position(etaLocation).title("Your are here"));
+
+
+
 
                         break;
                     case R.id.request_wait:
@@ -316,7 +368,7 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
 
                         int busNo = prefs.getInt(getString(R.string.bus_no), 0);
                         if (busNo==0){
-                            Toast.makeText(PassengerActivity.this, "Please add your bus no first in settings!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(PassengerActivity.this, "Please add your bus number first in settings!", Toast.LENGTH_LONG).show();
                             break;
                         }
                         DatabaseReference busRef = FirebaseDatabase.getInstance().getReference().child("Buses").child(String.valueOf(busNo));
@@ -381,16 +433,16 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
                                     public void onClick(DialogInterface dialogInterface, int i) {
                                         switch (i) {
                                             case 0:
-                                                bus_num = 2;
+                                                bus_num = 1111;
                                                 break;
                                             case 1:
-                                                bus_num = 8;
+                                                bus_num = 2222;
                                                 break;
                                             case 2:
-                                                bus_num = 1;
+                                                bus_num = 3333;
                                                 break;
                                             case 3:
-                                                bus_num = 4;
+                                                bus_num = 4444;
                                                 break;
 
                                         }
@@ -408,6 +460,7 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
 
                     case R.id.logout:
                         displayNotification();
+//                        LoginManager.getInstance().logOut();
                         FirebaseAuth.getInstance().signOut();
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.remove(getString(R.string.isDriver));
@@ -548,13 +601,13 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
     }
 
     @Override
-    public void onLocationChanged(Location location) {
+    public  void onLocationChanged(Location location) {
 
         mLastKnownLocation = location;
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         Log.e(LOG_TAG, "Latitude and longitude are : " + latLng);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
     }
 
@@ -576,4 +629,133 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
 
         notificationManagerCompat.notify(1, notification);
     }
+
+
+    public void displayNotification1() {
+        int plusone = durationtime+1;
+        Notification notification = new NotificationCompat
+                .Builder(this, BusTrackNotification.Logout_Channel)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle("Distance/Duration Information")
+                .setLargeIcon(BitmapFactory.decodeResource(getBaseContext().getResources(), R.drawable.ic_launcher_foreground))
+                .setContentText(distanceMeter+" Meters far away "+" || "+" Bus will come within "+durationtime+"-"+plusone+" Minutes")
+                .setAutoCancel(true)
+                .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400})
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .build();
+
+
+        notificationManagerCompat.notify(1, notification);
+    }
+
+
+
+    public void displayNotification2() {
+        Notification notification = new NotificationCompat
+                .Builder(this, BusTrackNotification.Logout_Channel)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle("Warning")
+                .setLargeIcon(BitmapFactory.decodeResource(getBaseContext().getResources(), R.drawable.ic_launcher_foreground))
+                .setContentText("Bus location not found")
+                .setAutoCancel(true)
+                .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400})
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .build();
+
+
+        notificationManagerCompat.notify(1, notification);
+    }
+
+
+
+    private Location getCurrentLocation() {
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) return null;
+
+        LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+        return location;
+    }
+
+
+
+    private double distance(double lat2, double lon2, char unit) {
+        Location location = getCurrentLocation();
+
+
+        double theta = location.getLongitude() - lon2;
+        double dist = Math.sin(deg2rad(location.getLatitude())) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(location.getLatitude())) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        if (unit == 'K') {
+            dist = dist * 1.609344;
+        } else if (unit == 'N') {
+            dist = dist * 0.8684;
+        }
+        return (dist);
+    }
+
+    /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+    /*::  This function converts decimal degrees to radians             :*/
+    /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+    private double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+    /*::  This function converts radians to decimal degrees             :*/
+    /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+    private double rad2deg(double rad) {
+        return (rad * 180.0 / Math.PI);
+    }
+
+
+    public double CalculationByDistance(double lat2, double lon2) {
+        Location location = getCurrentLocation();
+
+
+        Location location1 = new Location("");
+        location1.setLatitude(location.getLatitude());
+        location1.setLongitude(location.getLongitude());
+
+        Location location2 = new Location("");
+        location2.setLatitude(lat2);
+        location2.setLongitude(lon2);
+
+        float distanceInMeters = location1.distanceTo(location2);
+
+        //For example spead is 100 meters per minute.
+        int speedIs10MetersPerMinute = 100;
+        estimatedDriveTimeInMinutes = distanceInMeters / speedIs10MetersPerMinute;
+
+
+        int Radius = 6371;// radius of earth in Km
+        double lat1 = location.getLatitude();
+        double lon1 = location.getLongitude();
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1))
+                * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2)
+                * Math.sin(dLon / 2);
+        double c = 2 * Math.asin(Math.sqrt(a));
+        double valueResult = Radius * c;
+        double km = valueResult / 1;
+        DecimalFormat newFormat = new DecimalFormat("####");
+        int kmInDec = Integer.valueOf(newFormat.format(km));
+        double meter = valueResult % 1000;
+        int meterInDec = Integer.valueOf(newFormat.format(meter));
+        Log.i("far", "" + valueResult + "   KM  " + kmInDec
+                + " Meter   " + meterInDec);
+        Log.d("far",estimatedDriveTimeInMinutes+" Minutes");
+        Log.d("far",distanceInMeters+" in Meters");
+        distanceMeter =(int) distanceInMeters;
+        durationtime = (int) estimatedDriveTimeInMinutes;
+        Log.d("far",durationtime+" minutes");
+
+        return Radius * c;
+    }
+
 }

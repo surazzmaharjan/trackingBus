@@ -16,12 +16,12 @@
 
     <string name="title_activity_driver_maps">Map</string>
     <string name="title_activity_student_maps">Map</string>
-    <string name="get_eta">Get ETA</string>
+    <string name="get_eta">Get Estimate Time</string>
     <string name="ReadyToGo">Ready to go</string>
     <string name="logout">Logout</string>
     <string name="request_wait">Request Wait</string>
     <string name="locate_bus">Find nearest bus</string>
-    <string name="selectBusTitle">Whats your bus no?</string>
+    <string name="selectBusTitle">Whats your bus number?</string>
     <string name="ok">OK</string>
 
     <string name="Link_bus">Link Bus</string>
@@ -38,11 +38,14 @@
     <string name="launched_via_notification">launch_via_notification</string>
 
     <string-array name="bus_numbers">
-        <item>2</item>
-        <item>8</item>
-        <item>1</item>
-        <item>4</item>
+        <item>1111</item>
+        <item>2222</item>
+        <item>3333</item>
+        <item>4444</item>
     </string-array>
+
+    <string name="facebook_app_id">582541185777430</string>
+    <string name="fb_login_protocol_scheme">fb582541185777430</string>
 
 
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">

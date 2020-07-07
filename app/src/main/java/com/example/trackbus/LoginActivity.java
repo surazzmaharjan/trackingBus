@@ -1,6 +1,7 @@
 package com.example.trackbus;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
@@ -10,6 +11,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.widget.NestedScrollView;
 
 import android.app.Notification;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,20 +25,40 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.trackbus.service.BusTrackNotification;
 import com.example.trackbus.service.WifiConnection;
 import com.example.trackbus.validation.InputValidation;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Arrays;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -64,7 +86,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     NotificationManagerCompat notificationManagerCompat;
     WifiConnection wifiConnection = new WifiConnection();
+    CallbackManager callbackManager;
 
+    LoginButton loginButton;
+    private ProgressDialog mProgress;
 
     @Override
     protected void onStop() {
@@ -88,10 +113,24 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     }
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+//        FacebookSdk.sdkInitialize(getApplicationContext());
+//        AppEventsLogger.activateApp(this);
+//        callbackManager = CallbackManager.Factory.create();
+
         setContentView(R.layout.activity_login);
+
+//        loginButton = findViewById(R.id.login_button);
+//
+//        loginButton.setReadPermissions(Arrays.asList("email"));
+
+
 
 
         notificationManagerCompat= NotificationManagerCompat.from(this);
@@ -147,6 +186,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
 
 
+        mProgress = new ProgressDialog(LoginActivity.this, R.style.AppTheme_Dark_Dialog);
+        mProgress.setMessage("Authenticating...");
+        mProgress.setCancelable(false);
+        mProgress.setIndeterminate(true);
+
+
         mAuth = FirebaseAuth.getInstance();
 
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
@@ -186,6 +231,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         switch (view.getId()) {
             case R.id.appCompatButtonLogin:
 
+                mProgress.show();
                 String email =textInputEditTextEmail.getText().toString();
                 String password =textInputEditTextPassword.getText().toString();
 
@@ -305,6 +351,56 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 //        startActivity(mainIntent);
 //    }
 
+
+
+//    public void facebookLogin(View view){
+//        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+//            @Override
+//            public void onSuccess(LoginResult loginResult) {
+//                handlerFacebookToken(loginResult.getAccessToken());
+//
+//
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//                Toast.makeText(LoginActivity.this, "User cancelled it", Toast.LENGTH_SHORT).show();
+//            }
+//
+//            @Override
+//            public void onError(FacebookException error) {
+//                Toast.makeText(LoginActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+//
+//            }
+//        });
+//    }
+//
+//
+//    private void handlerFacebookToken(AccessToken accessToken){
+//        AuthCredential authCredential = FacebookAuthProvider.getCredential(accessToken.getToken());
+//        mProgress.show();
+//        loginButton.setVisibility(View.GONE);
+//        if (loginspinner.getSelectedItem().toString().equals("Driver")) {
+//            SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
+//            editor.putBoolean(getString(R.string.isDriver), true);
+//            editor.commit();
+//        }else{
+//            SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
+//            editor.remove(getString(R.string.isDriver));
+//            editor.commit();
+//        }
+//        mAuth.signInWithCredential(authCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+//            @Override
+//            public void onComplete(@NonNull Task<AuthResult> task) {
+//                if(!task.isSuccessful()){
+//                    Log.w("s", "signInWithEmail:failure", task.getException());
+////                                    Snackbar.make(loginnestedScrollView, "Authentication failed.", Snackbar.LENGTH_LONG).show();
+//                    Snackbar.make(loginnestedScrollView, "Authentication failed.", Snackbar.LENGTH_LONG).show();
+//
+//                }
+//            }
+//        });
+//    }
     /**
      * Notification for login
      */
@@ -323,4 +419,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         notificationManagerCompat.notify(1,notification);
     }
 
-}
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        callbackManager.onActivityResult(requestCode,resultCode,data);
+        super.onActivityResult(requestCode, resultCode, data);
+
+    }
+   }

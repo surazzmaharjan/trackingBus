@@ -10,6 +10,7 @@ public class User {
     private String sex;
     private String userid;
     private String status;
+    private String photoUrl;
 
 
     public User() {}
@@ -19,6 +20,14 @@ public class User {
 //        this.email = email;
 //    }
 
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
+    }
 
     public User(String email, String status) {
         this.status = status;

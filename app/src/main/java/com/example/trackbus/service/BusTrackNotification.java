@@ -13,6 +13,7 @@ public class BusTrackNotification {
     public final static String Refresh_Channel ="Refresh";
     public final static String Disconnected_Channel ="Disconnected";
     public final static String Connected_Channel ="Connected";
+    public final static String Distance_Channel ="Distance";
 
     public final static String Driver_Channel ="Available";
 
@@ -24,6 +25,12 @@ public class BusTrackNotification {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             NotificationChannel login = new NotificationChannel(Login_Channel,"Login", NotificationManager.IMPORTANCE_HIGH);
             login.setDescription("Successfully login to dashboard");
+            login.enableVibration(true);
+            login.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+            login.setShowBadge(false);
+
+
+            NotificationChannel distance = new NotificationChannel(Distance_Channel,"Distance", NotificationManager.IMPORTANCE_HIGH);
             login.enableVibration(true);
             login.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
             login.setShowBadge(false);
@@ -82,6 +89,8 @@ public class BusTrackNotification {
             manager.createNotificationChannel(disconnected);
             manager.createNotificationChannel(connected);
             manager.createNotificationChannel(available);
+            manager.createNotificationChannel(distance);
+
 
         }
     }
