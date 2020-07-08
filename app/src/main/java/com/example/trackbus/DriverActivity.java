@@ -6,6 +6,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -48,12 +49,16 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -107,12 +112,17 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     private TextView useremail ,userfullname;
     private ImageView profileimage;
 
+    CoordinatorLayout coordinatorLayout;
     private FirebaseAuth mAuth;
 
      NotificationManager mNotificationManager;
 
     NotificationManagerCompat notificationManagerCompat;
 
+    String currentBusStatus;
+
+    @BindView(R.id.bus_status_fab)
+    FloatingActionButton statusBus;
 
     @Override
     protected void onStop() {
@@ -165,6 +175,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
         /*View view=navigationView.inflateHeaderView(R.layout.nav_header_main);*/
 
+        coordinatorLayout = findViewById(R.id.driverCoordinatorlayout);
         useremail = header.findViewById(R.id.navemail);
 //        profileimage = header.findViewById(R.id.profile_img);
 //        userfullname = header.findViewById(R.id.navfullname);
@@ -181,6 +192,48 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 //
 //            Picasso.get().load(photoUrl).into(profileimage);
 //        }
+
+
+        statusBus = (FloatingActionButton) findViewById(R.id.bus_status_fab);
+
+        statusBus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (bus_num==0){
+                    Toast.makeText(DriverActivity.this, "Sorry, Please choose bus number first!", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                AlertDialog.Builder metaDialog = new AlertDialog.Builder(DriverActivity.this);
+                metaDialog.setTitle("Current bus status?")
+                        .setItems(R.array.bus_status, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                switch (i) {
+                                    case 0:
+                                        currentBusStatus="bus_full";
+                                        break;
+                                    case 1:
+                                        currentBusStatus="traffic_jam";
+
+                                        break;
+                                    case 2:
+                                        currentBusStatus="normal";
+
+                                        break;
+
+
+                                }
+                                String uId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                                DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Buses").child(String.valueOf(bus_num)).child("bus_status");
+                                ref.setValue(currentBusStatus);
+                                Snackbar.make(coordinatorLayout,"Current bus status updated",Snackbar.LENGTH_LONG).show();
+                            }
+                        });
+                metaDialog.show();
+
+            }
+        });
 
         mNotificationManager= (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -228,7 +281,11 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                                 passengerLocationLon = Double.parseDouble(map.get(1).toString());
                                 LatLng passengerLatLng = new LatLng(passengerLocationLat, passengerLocationLon);
                                 if (mPassengerMarker!=null) mPassengerMarker.remove();
-                                mPassengerMarker = mMap.addMarker(new MarkerOptions().position(passengerLatLng).title("Passenger Here!"));
+                                mPassengerMarker = mMap.addMarker
+                                        (new MarkerOptions()
+                                                .position(passengerLatLng)
+                                                .title("Passenger Here!")
+                                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                                 Log.e(LOG_TAG, "Location of the passenger is " + map.get(0));
                             }
 
@@ -455,6 +512,102 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("driver_available");
         GeoFire geoFire = new GeoFire(reference);
         geoFire.setLocation(uid, new GeoLocation(location.getLatitude(), location.getLongitude()));
+       final LatLng driverLoct= new LatLng(location.getLatitude(), location.getLongitude());
+
+        DatabaseReference busRefStatus;
+        busRefStatus = FirebaseDatabase.getInstance().getReference().child("Buses").child(String.valueOf(bus_num));
+
+
+
+        busRefStatus.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//
+//                String isStatus = dataSnapshot.getValue(String.class);
+//
+//                Log.d("status",isStatus);
+//                if (isStatus.equals("traffic_jam")) {
+//
+//                    mMap.addMarker(new MarkerOptions().position(driverLoct).title("Bus is stuck in traffic jam")
+//                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+//
+//                }
+//                else if(isStatus.equals("bus_full")) {
+//
+//                     mMap.addMarker(new MarkerOptions()
+//                            .position(driverLoct)
+//                            .title("Bus is fully occupied")
+//                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE)));
+//
+//                }
+//                else if(isStatus.equals("normal")) {
+//                     mMap.addMarker(new MarkerOptions()
+//                            .position(driverLoct)
+//                            .title("Your bus is here")
+//                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+//
+//                } else{
+//
+//                         mMap.addMarker(new MarkerOptions()
+//                                .position(driverLoct)
+//                                .title("Your bus is here")
+//                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+//                    }
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                String isStatus = dataSnapshot.getValue(String.class);
+
+                Log.d("status",isStatus);
+                if (isStatus.equals("traffic_jam")) {
+                         mMap.addMarker(new MarkerOptions().position(driverLoct).title("Bus is stuck in traffic jam")
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+
+                }
+                else if(isStatus.equals("bus_full")) {
+                     mMap.addMarker(new MarkerOptions()
+                            .position(driverLoct)
+                            .title("Bus is fully occupied")
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+
+                }
+                else if(isStatus.equals("normal")) {
+
+                     mMap.addMarker(new MarkerOptions()
+                            .position(driverLoct)
+                            .title("Your bus is here")
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+
+                } else{
+                   mMap.addMarker(new MarkerOptions()
+                                .position(driverLoct)
+                                .title("My bus")
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+
     }
 
     @Override

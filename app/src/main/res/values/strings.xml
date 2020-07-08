@@ -44,6 +44,12 @@
         <item>4444</item>
     </string-array>
 
+    <string-array name="bus_status">
+        <item>Bus Fully Occupied</item>
+        <item>In Traffic Jam</item>
+        <item>Normal</item>
+    </string-array>
+
     <string name="facebook_app_id">582541185777430</string>
     <string name="fb_login_protocol_scheme">fb582541185777430</string>
 

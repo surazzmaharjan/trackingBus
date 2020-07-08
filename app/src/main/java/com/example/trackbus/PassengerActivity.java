@@ -52,6 +52,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -125,6 +126,10 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
 
     float estimatedDriveTimeInMinutes;
     int durationtime,distanceMeter;
+
+    DatabaseReference busRefStatus;
+    String busnumberstatus;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -236,6 +241,9 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
 //        locateBus.setBackgroundColor(getResources().getColor(R.color.white));
 //        locateBus.setImageResource(R.drawable.activity);
 
+
+
+
         spinner=findViewById(R.id.progressBar1);
         spinner.setVisibility(View.GONE);
         spinner.getLayoutParams().height = 30;
@@ -284,14 +292,123 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
                                 buslon = Double.parseDouble(map.get(1).toString());
                             }
 
-                            LatLng busLocation = new LatLng(buslat, buslon);
+
+                            final LatLng busLocationStatus = new LatLng(buslat, buslon);
 
 
-                            if (mBusMarker != null) mBusMarker.remove();
-                            mBusMarker = mMap.addMarker(new MarkerOptions().position(busLocation).title("Your bus here"));
 
-//                            Log.d("far",distance(buslat,buslon,'K')+" Kilometers far away");
-                            Log.d("far",distance(buslat,buslon,'M')+" Miles far away");
+                            Log.d("far",distance(buslat,buslon,'K')+" Kilometers far away");
+                                Log.d("far", distance(buslat, buslon, 'M') + " Miles far away");
+
+                            busRefStatus = FirebaseDatabase.getInstance().getReference().child("Buses").child(String.valueOf(bus_num));
+
+
+                            busRefStatus.addChildEventListener(new ChildEventListener() {
+                                @Override
+                                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+                                    String isStatus = dataSnapshot.getValue(String.class);
+
+                                    Log.d("status",isStatus);
+                                    if (isStatus.equals("traffic_jam")) {
+
+                                        if (mBusMarker != null) mBusMarker.remove();
+                                        mBusMarker = mMap.addMarker(new MarkerOptions().position(busLocationStatus).title("Bus is stuck in traffic jam")
+                                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+
+                                    }
+                                    else if(isStatus.equals("bus_full")) {
+                                        if (mBusMarker != null) mBusMarker.remove();
+                                        mBusMarker = mMap.addMarker(new MarkerOptions()
+                                                .position(busLocationStatus)
+                                                .title("Bus is fully occupied")
+                                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+
+                                    }
+                                    else if(isStatus.equals("normal")) {
+
+                                        if (mBusMarker != null) mBusMarker.remove();
+                                        mBusMarker = mMap.addMarker(new MarkerOptions()
+                                                .position(busLocationStatus)
+                                                .title("Your bus is here")
+                                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+
+                                    } else{
+                                        if (mBusMarker != null)
+                                            mBusMarker.remove();
+                                            mBusMarker = mMap.addMarker(new MarkerOptions()
+                                                    .position(busLocationStatus)
+                                                    .title("Your bus is here")
+                                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+
+                                    }
+
+
+
+
+                                }
+
+                                @Override
+                                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                                    String isStatus = dataSnapshot.getValue(String.class);
+
+                                    Log.d("status",isStatus);
+                                    if (isStatus.equals("traffic_jam")) {
+
+                                        if (mBusMarker != null) mBusMarker.remove();
+                                        mBusMarker = mMap.addMarker(new MarkerOptions().position(busLocationStatus).title("Bus is stuck in traffic jam")
+                                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+
+                                    }
+                                    else if(isStatus.equals("bus_full")) {
+                                        if (mBusMarker != null) mBusMarker.remove();
+                                        mBusMarker = mMap.addMarker(new MarkerOptions()
+                                                .position(busLocationStatus)
+                                                .title("Bus is fully occupied")
+                                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+
+                                    }
+                                    else if(isStatus.equals("normal")) {
+
+                                        if (mBusMarker != null) mBusMarker.remove();
+                                        mBusMarker = mMap.addMarker(new MarkerOptions()
+                                                .position(busLocationStatus)
+                                                .title("Your bus is here")
+                                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+
+                                    } else{
+                                        if (mBusMarker != null)
+                                            mBusMarker.remove();
+                                            mBusMarker = mMap.addMarker(new MarkerOptions()
+                                                    .position(busLocationStatus)
+                                                    .title("Your bus is here")
+                                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+
+                                    }
+                                }
+
+                                @Override
+                                public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                                }
+
+                                @Override
+                                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+
+
+
+
+
 
                         }
 
@@ -363,7 +480,8 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
                         geofire.setLocation(userId, new GeoLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
 
                         etaLocation = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(etaLocation));
+                        mMap.addMarker(new MarkerOptions().position(etaLocation).title("Me")
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
                         Toast.makeText(PassengerActivity.this, "Requesting...", Toast.LENGTH_SHORT).show();
 
                         int busNo = prefs.getInt(getString(R.string.bus_no), 0);
@@ -453,6 +571,7 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
                                         SharedPreferences.Editor editor = prefs.edit();
                                         editor.putInt(getString(R.string.bus_no), bus_num);
                                         editor.commit();
+
                                     }
                                 });
                         metadialogBuilder.show();

@@ -11,6 +11,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/driverCoordinatorlayout"
         android:fitsSystemWindows="false">
 
         <include layout="@layout/toolbar" />
@@ -27,17 +28,17 @@
                 android:layout_height="match_parent"
                 tools:context=".DriverActivity" />
 
-            <Button
-                android:id="@+id/eta"
-                android:layout_width="match_parent"
-                android:layout_height="37dp"
-                android:layout_gravity="bottom"
-                android:text="@string/ReadyToGo"
-                android:layout_marginLeft="22dp"
-                android:layout_marginRight="58dp"
-                android:layout_marginBottom="22dp"
-                android:background="@color/colorPrimary"
-                />
+<!--            <Button-->
+<!--                android:id="@+id/eta"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="37dp"-->
+<!--                android:layout_gravity="bottom"-->
+<!--                android:text="@string/ReadyToGo"-->
+<!--                android:layout_marginLeft="22dp"-->
+<!--                android:layout_marginRight="58dp"-->
+<!--                android:layout_marginBottom="22dp"-->
+<!--                android:background="@color/colorPrimary"-->
+<!--                />-->
 
             <Button
                 android:id="@+id/logout_btn_driver"
@@ -63,6 +64,17 @@
                 android:text="Profile"
                 android:visibility="gone"/>
 
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/bus_status_fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+                android:layout_marginBottom="76dp"
+                android:background="@color/textColor"
+                android:src="@drawable/transport"
+                app:backgroundTint="@color/textColor"
+                android:layout_marginRight="4dp"
+                />
 
         </FrameLayout>
 
