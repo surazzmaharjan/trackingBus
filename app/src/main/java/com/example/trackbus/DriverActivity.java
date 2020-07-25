@@ -173,25 +173,25 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         View header=mNavigationView.getHeaderView(0);
 
 
-        /*View view=navigationView.inflateHeaderView(R.layout.nav_header_main);*/
 
         coordinatorLayout = findViewById(R.id.driverCoordinatorlayout);
         useremail = header.findViewById(R.id.navemail);
-//        profileimage = header.findViewById(R.id.profile_img);
-//        userfullname = header.findViewById(R.id.navfullname);
+        profileimage = header.findViewById(R.id.profile_img);
+        userfullname = header.findViewById(R.id.navfullname);
 
+        userfullname.setVisibility(View.VISIBLE);
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
         useremail.setText(currentUser.getEmail());
-//        userfullname.setText(currentUser.getDisplayName());
+        userfullname.setText(currentUser.getDisplayName());
 ////        Log.d("cuser",currentUser.getDisplayName());
-//        if(currentUser.getPhotoUrl()!=null){
-//            String photoUrl = currentUser.getPhotoUrl().toString();
-//            photoUrl = photoUrl+ "?type=large";
-//
-//            Picasso.get().load(photoUrl).into(profileimage);
-//        }
+        if(currentUser.getPhotoUrl()!=null){
+            String photoUrl = currentUser.getPhotoUrl().toString();
+            photoUrl = photoUrl+ "?type=large";
+
+            Picasso.get().load(photoUrl).into(profileimage);
+        }
 
 
         statusBus = (FloatingActionButton) findViewById(R.id.bus_status_fab);
@@ -408,12 +408,12 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                 break;
 
 
-            case R.id.profile:
-                Intent pintent = new Intent(DriverActivity.this, ProfileActivity.class);
-                startActivity(pintent);
-                finish();
-
-                break;
+//            case R.id.profile:
+//                Intent pintent = new Intent(DriverActivity.this, ProfileActivity.class);
+//                startActivity(pintent);
+//                finish();
+//
+//                break;
             case R.id.link_bus:
                 AlertDialog.Builder metaDialog = new AlertDialog.Builder(DriverActivity.this);
                 metaDialog.setTitle(getString(R.string.selectBusTitle))
@@ -444,7 +444,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                 break;
             case R.id.logout:
                 displayNotification();
-//                LoginManager.getInstance().logOut();
+                LoginManager.getInstance().logOut();
                 FirebaseAuth.getInstance().signOut();
                 SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
                 editor.remove(getString(R.string.isDriver));
@@ -512,6 +512,8 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("driver_available");
         GeoFire geoFire = new GeoFire(reference);
         geoFire.setLocation(uid, new GeoLocation(location.getLatitude(), location.getLongitude()));
+
+
        final LatLng driverLoct= new LatLng(location.getLatitude(), location.getLongitude());
 
         DatabaseReference busRefStatus;
@@ -522,7 +524,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         busRefStatus.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//
+
 //                String isStatus = dataSnapshot.getValue(String.class);
 //
 //                Log.d("status",isStatus);
@@ -581,12 +583,13 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                             .title("Your bus is here")
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
 
-                } else{
-                   mMap.addMarker(new MarkerOptions()
-                                .position(driverLoct)
-                                .title("My bus")
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                 }
+//                else{
+//                   mMap.addMarker(new MarkerOptions()
+//                                .position(driverLoct)
+//                                .title("My bus")
+//                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+//                }
             }
 
             @Override

@@ -14,22 +14,22 @@
         android:id="@+id/profile_img"
         android:src="@drawable/profile"/>
 
-<!--    <TextView android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:id="@+id/navfullname"-->
-<!--        android:paddingTop="8dp"-->
-<!--        android:paddingLeft="8dp"-->
-<!--        android:textStyle="bold"-->
-<!--        android:textSize="18sp"-->
-<!--        android:textColor="@android:color/white"-->
-<!--        android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>-->
+    <TextView android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/navfullname"
+        android:paddingLeft="8dp"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:visibility="gone"
+        android:textColor="@android:color/white"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
 
     <TextView android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/navemail"
         android:hint="No Email"
         android:paddingLeft="8dp"
-        android:paddingTop="8dp"
+        android:paddingTop="5dp"
         android:textStyle="bold|italic"
         android:textColor="@android:color/white"
     android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>

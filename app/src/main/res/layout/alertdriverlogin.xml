@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nestedScrollViewalertdriverlogin"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="20dp"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
+    android:paddingTop="20dp">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="20dp"
+        >
+
+
+        <androidx.appcompat.widget.AppCompatSpinner
+            android:id="@+id/driverloginchooser_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:entries="@array/choosedriver"
+            android:scrollbarSize="20sp"
+            android:gravity="end"
+            android:visibility="gone"
+            />
+
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/login_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:onClick="facebookLogin"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp" />
+
+
+
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

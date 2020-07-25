@@ -23,6 +23,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -37,11 +38,13 @@ import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -59,6 +62,9 @@ import org.json.JSONObject;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -80,7 +86,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     DatabaseReference rootRef;
     DatabaseReference userRef;
 
-    private Spinner loginspinner;
+    private Spinner loginspinner,driverspinner;
 
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
@@ -90,6 +96,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     LoginButton loginButton;
     private ProgressDialog mProgress;
+
+    @BindView(R.id.driver_login_fab)
+    FloatingActionButton driverlogin;
+
+
+    LayoutInflater dialoginflater;
+
 
     @Override
     protected void onStop() {
@@ -120,18 +133,47 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
 
 
-//        FacebookSdk.sdkInitialize(getApplicationContext());
+        FacebookSdk.sdkInitialize(getApplicationContext());
 //        AppEventsLogger.activateApp(this);
-//        callbackManager = CallbackManager.Factory.create();
+        callbackManager = CallbackManager.Factory.create();
 
         setContentView(R.layout.activity_login);
 
-//        loginButton = findViewById(R.id.login_button);
-//
-//        loginButton.setReadPermissions(Arrays.asList("email"));
 
 
 
+        driverlogin = (FloatingActionButton) findViewById(R.id.driver_login_fab);
+
+
+
+
+        driverlogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                dialoginflater = (LayoutInflater) getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+
+                AlertDialog.Builder metaDialog = new AlertDialog.Builder(LoginActivity.this);
+
+                final View dialogView = dialoginflater.inflate(R.layout.alertdriverlogin, null);
+                metaDialog.setTitle("Login as Driver");
+                metaDialog.setIcon(R.drawable.transport);
+                metaDialog.setView(dialogView);
+
+
+                loginButton = dialogView.findViewById(R.id.login_button);
+                driverspinner = dialogView.findViewById(R.id.driverloginchooser_spinner);
+                loginButton.setReadPermissions(Arrays.asList("email"));
+                loginButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        facebookLogin(view);
+                    }
+                });
+                metaDialog.show();
+
+            }
+        });
 
         notificationManagerCompat= NotificationManagerCompat.from(this);
         BusTrackNotification channel = new BusTrackNotification(this);
@@ -353,54 +395,54 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
 
 
-//    public void facebookLogin(View view){
-//        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-//            @Override
-//            public void onSuccess(LoginResult loginResult) {
-//                handlerFacebookToken(loginResult.getAccessToken());
-//
-//
-//            }
-//
-//            @Override
-//            public void onCancel() {
-//                Toast.makeText(LoginActivity.this, "User cancelled it", Toast.LENGTH_SHORT).show();
-//            }
-//
-//            @Override
-//            public void onError(FacebookException error) {
-//                Toast.makeText(LoginActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
-//
-//            }
-//        });
-//    }
-//
-//
-//    private void handlerFacebookToken(AccessToken accessToken){
-//        AuthCredential authCredential = FacebookAuthProvider.getCredential(accessToken.getToken());
-//        mProgress.show();
+    public void facebookLogin(View view){
+        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                handlerFacebookToken(loginResult.getAccessToken());
+
+
+            }
+
+            @Override
+            public void onCancel() {
+                Toast.makeText(LoginActivity.this, "User cancelled it", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Toast.makeText(LoginActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+
+            }
+        });
+    }
+
+
+    private void handlerFacebookToken(AccessToken accessToken){
+        AuthCredential authCredential = FacebookAuthProvider.getCredential(accessToken.getToken());
+        mProgress.show();
 //        loginButton.setVisibility(View.GONE);
-//        if (loginspinner.getSelectedItem().toString().equals("Driver")) {
-//            SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
-//            editor.putBoolean(getString(R.string.isDriver), true);
-//            editor.commit();
-//        }else{
-//            SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
-//            editor.remove(getString(R.string.isDriver));
-//            editor.commit();
-//        }
-//        mAuth.signInWithCredential(authCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-//            @Override
-//            public void onComplete(@NonNull Task<AuthResult> task) {
-//                if(!task.isSuccessful()){
-//                    Log.w("s", "signInWithEmail:failure", task.getException());
-////                                    Snackbar.make(loginnestedScrollView, "Authentication failed.", Snackbar.LENGTH_LONG).show();
-//                    Snackbar.make(loginnestedScrollView, "Authentication failed.", Snackbar.LENGTH_LONG).show();
-//
-//                }
-//            }
-//        });
-//    }
+        if (driverspinner.getSelectedItem().toString().equals("Driver")) {
+            SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
+            editor.putBoolean(getString(R.string.isDriver), true);
+            editor.commit();
+        }else{
+            SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
+            editor.remove(getString(R.string.isDriver));
+            editor.commit();
+        }
+        mAuth.signInWithCredential(authCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(!task.isSuccessful()){
+                    Log.w("s", "signInWithEmail:failure", task.getException());
+//                                    Snackbar.make(loginnestedScrollView, "Authentication failed.", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(loginnestedScrollView, "Authentication failed.", Snackbar.LENGTH_LONG).show();
+
+                }
+            }
+        });
+    }
     /**
      * Notification for login
      */
