@@ -31,10 +31,10 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profilepicture"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:scaleType="fitCenter"
                 android:layout_gravity="center_horizontal"
                 android:src="@drawable/profile" />
 

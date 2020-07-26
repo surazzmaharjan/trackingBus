@@ -37,5 +37,7 @@
     <color name="colorPrimarySplash">#9274BD</color>
     <color name="colorPrimaryDarkSplash">#3C2E5C</color>
 
+    <color name="white_greyish">#808080</color>
+    <color name="light_grey">#e4e4e4</color>
 
 </resources>

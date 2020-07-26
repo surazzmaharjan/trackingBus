@@ -6,6 +6,13 @@
 <!--            android:id="@+id/profile"-->
 <!--            android:title="Profile"-->
 <!--            android:icon="@drawable/ic_baseline_person_pin_24"/>-->
+
+
+    <item
+        android:id="@+id/passengerlistdrawer"
+        android:title="All Passenger"
+        android:icon="@drawable/ic_baseline_group_24"/>
+
         <item
             android:id="@+id/link_bus"
             android:title="Link Bus"

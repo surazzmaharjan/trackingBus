@@ -414,6 +414,15 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 //                finish();
 //
 //                break;
+
+            case R.id.passengerlistdrawer:
+                Intent pintent = new Intent(DriverActivity.this, AllPassengerList.class);
+                startActivity(pintent);
+                finish();
+
+                break;
+
+
             case R.id.link_bus:
                 AlertDialog.Builder metaDialog = new AlertDialog.Builder(DriverActivity.this);
                 metaDialog.setTitle(getString(R.string.selectBusTitle))
@@ -493,10 +502,17 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     protected void onDestroy() {
         super.onDestroy();
 
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("driver_available");
-        GeoFire geoFire = new GeoFire(reference);
-        geoFire.removeLocation(uid);
+
+        FirebaseUser mFirebaseUser = mAuth.getCurrentUser();
+        if(mFirebaseUser != null) {
+            String uid = mFirebaseUser.getUid(); //Do what you need to do with the id
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("driver_available");
+            GeoFire geoFire = new GeoFire(reference);
+            geoFire.removeLocation(uid);
+        }
+
+
+
     }
 
     @Override

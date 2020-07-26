@@ -213,7 +213,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     workplace = workEditText.getText().toString();
                     password = passwordEditText.getText().toString();
                     String usertype = spinner.getSelectedItem().toString();
-//                    user_type = spinner.getSelectedItem().toString();
+                    user_type = spinner.getSelectedItem().toString();
 
                     if (!inputValidation.isInputEditTextFilled(emailEditText, textInputLayoutSignupEmail, "Enter a email")) {
                         return;
@@ -269,7 +269,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 break;
 
             case R.id.appCompatTextViewLoginLink:
-                finish();
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                startActivity(intent);
                 break;
         }
     }

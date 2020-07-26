@@ -45,6 +45,19 @@ public class User {
     }
 
 
+    public User(String fullName, String email, String profession,
+                String workplace, String phone,String userid,String photoUrl) {
+        this.email = email;
+        this.fullName = fullName;
+        this.profession = profession;
+        this.workplace = workplace;
+        this.phone = phone;
+        this.userid = userid;
+        this.photoUrl = photoUrl;
+
+    }
+
+
     public User(String fullName,  String profession,
                 String workplace, String phone) {
         this.fullName = fullName;

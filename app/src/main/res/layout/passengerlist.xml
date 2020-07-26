@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:card_view="http://schemas.android.com/tools"
+    app:cardElevation="2dp"
+    android:layout_margin="8dp"
+    card_view:cardCornerRadius="5dp">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        >
+
+        <RelativeLayout
+            android:id="@+id/rellay1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="15dp">
+
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/imgView_proPic"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:src="@drawable/profile" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_toRightOf="@+id/imgView_proPic"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_fullname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+
+                    android:text="Suraj Maharjan"
+                    android:textStyle="bold"
+                    android:textColor="@color/textBlack"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tv_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="suraj@gmail.com"
+                    android:textStyle="italic"
+                    android:textColor="@color/white_greyish"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+<!--        <ImageView-->
+<!--            android:id="@+id/imgView_moviePic"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_below="@+id/rellay1"-->
+<!--            android:layout_marginTop="5dp"-->
+<!--            android:adjustViewBounds="true"-->
+<!--            android:scaleType="fitCenter"-->
+<!--            />-->
+        <!--        android:src="@drawable/ic_launcher_background"-->
+        <TextView
+            android:id="@+id/tv_title_description"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rellay1"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="15dp"
+            android:text="Profession : "
+            android:textColor="@color/textBlack"
+            android:textStyle="bold"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tv_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rellay1"
+            android:layout_toRightOf="@+id/tv_title_description"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="15dp"
+            android:text="student"
+            android:textColor="@color/textBlack"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/imgView_lines"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_below="@+id/tv_title_description"
+            android:layout_marginTop="10dp"
+            android:background="@color/light_grey" />
+
+        <TextView
+            android:id="@+id/tv_title_phonenumber"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_title_description"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="15dp"
+            android:text="Phone : "
+            android:textColor="@color/textBlack"
+            android:textStyle="bold"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tv_phonenumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_title_description"
+            android:layout_toRightOf="@+id/tv_title_phonenumber"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="15dp"
+            android:text="233434"
+            android:textColor="@color/textBlack"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/imgView_line"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_below="@+id/tv_phonenumber"
+            android:layout_marginTop="10dp"
+            android:background="@color/light_grey" />
+
+        <TextView
+            android:id="@+id/tv_title_workplace"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_title_phonenumber"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="15dp"
+            android:text="Workplace :"
+            android:textColor="@color/textBlack"
+            android:textStyle="bold"
+            android:textSize="18sp" />
+
+
+
+        <TextView
+            android:id="@+id/tv_workplace"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_title_phonenumber"
+            android:layout_toRightOf="@+id/tv_title_workplace"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="15dp"
+            android:text="kathamndu"
+            android:textColor="@color/textBlack"
+            android:textSize="16sp" />
+
+
+
+
+
+
+    </RelativeLayout>
+
+
+
+</androidx.cardview.widget.CardView>

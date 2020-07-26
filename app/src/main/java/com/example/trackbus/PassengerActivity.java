@@ -66,6 +66,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -149,25 +150,49 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
 
         View header=mNavigationView.getHeaderView(0);
         useremail = header.findViewById(R.id.navemail);
-//        profileimage = header.findViewById(R.id.profile_img);
-//        userfullname = header.findViewById(R.id.navfullname);
+        profileimage = header.findViewById(R.id.profile_img);
+        userfullname = header.findViewById(R.id.navfullname);
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
-        useremail.setText(currentUser.getEmail());
-//        userfullname.setText(currentUser.getDisplayName());
 
 
-//        if(currentUser.getPhotoUrl()!=null){
-//            String photoUrl = currentUser.getPhotoUrl().toString();
-//            photoUrl = photoUrl+ "?type=large";
-//
-////            Log.d("cuser",photoUrl);
-//
-//            Picasso.get().load(photoUrl).into(profileimage);
-//        }
-//
+
+        DatabaseReference rootReff = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference userReff = rootReff.child("Users_Detail");
+
+        // Read from the database
+        userReff.addValueEventListener(new ValueEventListener() {
+            String fnames, cemails, professions, workplaces, phones,purl;
+
+            FirebaseUser fireuserss = mAuth.getCurrentUser();
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot keyId: dataSnapshot.getChildren()) {
+                    if (keyId.child("email").getValue().equals(fireuserss.getEmail())) {
+                        fnames = keyId.child("fullName").getValue(String.class);
+                        cemails = keyId.child("email").getValue(String.class);
+                        purl = keyId.child("photoUrl").getValue(String.class);
+                        break;
+                    }
+                }
+                useremail.setText(cemails);
+                userfullname.setText(fnames);
+
+
+                if(purl!=null){
+
+                    Picasso.get().load(purl).into(profileimage);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.d("s", "Failed to read value.", error.toException());
+            }
+        });
 
 
 
