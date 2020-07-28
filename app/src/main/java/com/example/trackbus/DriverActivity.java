@@ -28,6 +28,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.media.RingtoneManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -128,10 +129,14 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     @BindView(R.id.bus_status_fab)
     FloatingActionButton statusBus;
 
-    Geocoder geocoder;
-    List<Address> addresses;
-    String address,city,state,substate,country,postalCode,feature,subcity,fare,subfare,premise;
+    private Geocoder geocoder;
+    private List<Address> addresses;
+    private List<Address> addressess;
+    private String address,city,state,substate,country,postalCode,feature,subcity,fare,subfare,premise;
+    private String addresss,citys,states,substates,countrys,postalCodes,features,subcitys,fares,subfares,premises;
+
     String title;
+    Marker busStatusMaker;
 
     @Override
     protected void onStop() {
@@ -289,40 +294,41 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                                 passengerLocationLon = Double.parseDouble(map.get(1).toString());
                                 LatLng passengerLatLng = new LatLng(passengerLocationLat, passengerLocationLon);
 
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Geocoder.isPresent()) {
+                                    geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
 
-                                geocoder = new Geocoder(DriverActivity.this, Locale.getDefault());
 
+                                    try {
+                                        addresses = geocoder.getFromLocation(passengerLocationLat, passengerLocationLon, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+//                                    address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                                        city = addresses.get(0).getLocality();
+                                        state = addresses.get(0).getAdminArea();
+                                        country = addresses.get(0).getCountryName();
+                                        substate = addresses.get(0).getSubAdminArea();
+                                        fare = addresses.get(0).getThoroughfare();
+                                        subfare = addresses.get(0).getThoroughfare();
+                                        premise = addresses.get(0).getPremises();
 
+                                        postalCode = addresses.get(0).getPostalCode();
+                                        subcity = addresses.get(0).getSubLocality();
 
-                                try {
-                                    addresses = geocoder.getFromLocation(passengerLocationLat, passengerLocationLon, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-                                    address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
-                                    city = addresses.get(0).getLocality();
-                                    state = addresses.get(0).getAdminArea();
-                                    country = addresses.get(0).getCountryName();
-                                    substate = addresses.get(0).getSubAdminArea();
-                                    fare = addresses.get(0).getThoroughfare();
-                                    subfare = addresses.get(0).getThoroughfare();
-                                    premise = addresses.get(0).getPremises();
+                                        feature = addresses.get(0).getFeatureName();
+                                        title = address + "-" + city + "-" + state;
 
-                                    postalCode = addresses.get(0).getPostalCode();
-                                    subcity = addresses.get(0).getSubLocality();
-
-                                    feature = addresses.get(0).getFeatureName();
-                                    title = address +"-"+city+"-"+state;
-
-                                } catch (IOException e) {
-                                    e.printStackTrace();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
-
 
                                 if (mPassengerMarker!=null) mPassengerMarker.remove();
                                 mPassengerMarker = mMap.addMarker
                                         (new MarkerOptions()
                                                 .position(passengerLatLng)
-                                                .title(subcity+","+city+" (Passenger)")
+                                                .title(subcity+","+city)
+                                                .snippet("Your passenger")
                                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                                 Log.e(LOG_TAG, "Location of the passenger is " + map.get(0));
+                                mPassengerMarker.showInfoWindow();
                             }
 
                             @Override
@@ -558,21 +564,49 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         Log.e(LOG_TAG, "Latitude and longitude are : " + latLng);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
 
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("driver_available");
-        GeoFire geoFire = new GeoFire(reference);
-        geoFire.setLocation(uid, new GeoLocation(location.getLatitude(), location.getLongitude()));
+//        FirebaseUser mFirebaseUsers = mAuth.getCurrentUser();
 
+//        if(mFirebaseUsers != null) {
+            String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("driver_available");
+            GeoFire geoFire = new GeoFire(reference);
+            geoFire.setLocation(uid, new GeoLocation(location.getLatitude(), location.getLongitude()));
+//        }
 
        final LatLng driverLoct= new LatLng(location.getLatitude(), location.getLongitude());
 
         DatabaseReference busRefStatus;
         busRefStatus = FirebaseDatabase.getInstance().getReference().child("Buses").child(String.valueOf(bus_num));
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Geocoder.isPresent()) {
+
+            geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
 
 
+            try {
+                addressess = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+////            addresss = addressess.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                citys = addressess.get(0).getLocality();
+                states = addressess.get(0).getAdminArea();
+                countrys = addressess.get(0).getCountryName();
+                substates = addressess.get(0).getSubAdminArea();
+                fares = addressess.get(0).getThoroughfare();
+                subfares = addressess.get(0).getThoroughfare();
+                premises = addressess.get(0).getPremises();
+
+                postalCodes = addressess.get(0).getPostalCode();
+                subcitys = addressess.get(0).getSubLocality();
+
+                features = addressess.get(0).getFeatureName();
+                title = addresss + "-" + citys + "-" + states;
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         busRefStatus.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -617,23 +651,32 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
                 Log.d("status",isStatus);
                 if (isStatus.equals("traffic_jam")) {
-                         mMap.addMarker(new MarkerOptions().position(driverLoct).title("Bus is stuck in traffic jam")
+                    if (busStatusMaker != null) busStatusMaker.remove();
+                    busStatusMaker= mMap.addMarker(new MarkerOptions().position(driverLoct)
+                            .title(subcitys+","+citys)
+                            .snippet("Bus is stuck in traffic jam")
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                    busStatusMaker.showInfoWindow();
 
                 }
                 else if(isStatus.equals("bus_full")) {
-                     mMap.addMarker(new MarkerOptions()
+                    if (busStatusMaker != null) busStatusMaker.remove();
+                    busStatusMaker= mMap.addMarker(new MarkerOptions()
                             .position(driverLoct)
-                            .title("Bus is fully occupied")
+                            .title(subcitys+","+citys)
+                            .snippet("Bus is fully occupied")
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                    busStatusMaker.showInfoWindow();
 
                 }
                 else if(isStatus.equals("normal")) {
-
-                     mMap.addMarker(new MarkerOptions()
+                    if (busStatusMaker != null) busStatusMaker.remove();
+                    busStatusMaker = mMap.addMarker(new MarkerOptions()
                             .position(driverLoct)
-                            .title("Your bus is here")
+                            .title(subcitys+","+citys)
+                            .snippet("Your bus is here")
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                    busStatusMaker.showInfoWindow();
 
                 }
 //                else{
