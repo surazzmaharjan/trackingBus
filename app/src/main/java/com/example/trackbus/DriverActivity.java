@@ -654,7 +654,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     if (busStatusMaker != null) busStatusMaker.remove();
                     busStatusMaker= mMap.addMarker(new MarkerOptions().position(driverLoct)
                             .title(subcitys+","+citys)
-                            .snippet("Bus is stuck in traffic jam")
+                            .snippet("My bus is stuck in traffic jam")
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
                     busStatusMaker.showInfoWindow();
 
@@ -664,7 +664,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     busStatusMaker= mMap.addMarker(new MarkerOptions()
                             .position(driverLoct)
                             .title(subcitys+","+citys)
-                            .snippet("Bus is fully occupied")
+                            .snippet("My bus is fully occupied")
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                     busStatusMaker.showInfoWindow();
 
@@ -674,7 +674,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     busStatusMaker = mMap.addMarker(new MarkerOptions()
                             .position(driverLoct)
                             .title(subcitys+","+citys)
-                            .snippet("Your bus is here")
+                            .snippet("My bus is here")
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                     busStatusMaker.showInfoWindow();
 
