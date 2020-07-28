@@ -144,6 +144,7 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
     private String addresss,citys,states,substates,countrys,postalCodes,features,subcitys,fares,subfares,premises;
     String title;
     String addressText;
+    String keybus="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -306,7 +307,7 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
             @Override
             public void onClick(View v) {
                 Toast.makeText(PassengerActivity.this, "Lets go Lets go!", Toast.LENGTH_SHORT).show();
-                if (busDriverKey.isEmpty()){
+                if (keybus.isEmpty()){
                     Toast.makeText(PassengerActivity.this, "Sorry, Your driver is not online!", Toast.LENGTH_LONG).show();
                     return;
                 }
@@ -316,7 +317,8 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
 //                GeoFire geoFire = new GeoFire(reference);
 //                geoFire.setLocation(uid, new GeoLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
 //
-                DatabaseReference busLocation = FirebaseDatabase.getInstance().getReference().child("driver_available").child(busDriverKey).child("l");
+                Log.d("busDriverKey",keybus);
+                DatabaseReference busLocation = FirebaseDatabase.getInstance().getReference().child("driver_available").child(keybus).child("l");
                 busLocation.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -324,11 +326,17 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
                             List<Object> map = (List<Object>)dataSnapshot.getValue();
 
                             if (map.get(0) != null){
+
                                 buslat = Double.parseDouble(map.get(0).toString());
+                                Log.d("busDriverKey",buslat+"");
+
                             }
 
                             if (map.get(1) != null){
+
                                 buslon = Double.parseDouble(map.get(1).toString());
+                                Log.d("busDriverKey",buslon+"");
+
                             }
 
 
@@ -618,7 +626,7 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
                                     map.put("busDriverID", busDriverKey);
                                     ref.child(userId).updateChildren(map);
                                     Log.e(LOG_TAG, "keyis : " + busDriverKey);
-
+                                    keybus=busDriverKey;
                                     String passengerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
                                     DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference().child("Users")
                                             .child("Driver")
