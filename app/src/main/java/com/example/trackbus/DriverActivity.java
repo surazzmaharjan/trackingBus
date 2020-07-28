@@ -615,32 +615,34 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 //
 //                Log.d("status",isStatus);
 //                if (isStatus.equals("traffic_jam")) {
-//
-//                    mMap.addMarker(new MarkerOptions().position(driverLoct).title("Bus is stuck in traffic jam")
+//                    if (busStatusMaker != null) busStatusMaker.remove();
+//                    busStatusMaker= mMap.addMarker(new MarkerOptions().position(driverLoct)
+//                            .title(subcitys+","+citys)
+//                            .snippet("My bus is stuck in traffic jam")
 //                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+////                    busStatusMaker.showInfoWindow();
 //
 //                }
 //                else if(isStatus.equals("bus_full")) {
-//
-//                     mMap.addMarker(new MarkerOptions()
+//                    if (busStatusMaker != null) busStatusMaker.remove();
+//                    busStatusMaker= mMap.addMarker(new MarkerOptions()
 //                            .position(driverLoct)
-//                            .title("Bus is fully occupied")
-//                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE)));
+//                            .title(subcitys+","+citys)
+//                            .snippet("My bus is fully occupied")
+//                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+////                    busStatusMaker.showInfoWindow();
 //
 //                }
 //                else if(isStatus.equals("normal")) {
-//                     mMap.addMarker(new MarkerOptions()
+//                    if (busStatusMaker != null) busStatusMaker.remove();
+//                    busStatusMaker = mMap.addMarker(new MarkerOptions()
 //                            .position(driverLoct)
-//                            .title("Your bus is here")
+//                            .title(subcitys+","+citys)
+//                            .snippet("My bus is here")
 //                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+////                    busStatusMaker.showInfoWindow();
 //
-//                } else{
-//
-//                         mMap.addMarker(new MarkerOptions()
-//                                .position(driverLoct)
-//                                .title("Your bus is here")
-//                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-//                    }
+//                }
 
             }
 
@@ -679,12 +681,16 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     busStatusMaker.showInfoWindow();
 
                 }
-//                else{
-//                   mMap.addMarker(new MarkerOptions()
-//                                .position(driverLoct)
-//                                .title("My bus")
-//                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-//                }
+                else{
+                    if (busStatusMaker != null) busStatusMaker.remove();
+                    busStatusMaker =mMap.addMarker(new MarkerOptions()
+                                .position(driverLoct)
+                                .title(subcitys+","+citys)
+                                .snippet("My bus is here")
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                    busStatusMaker.showInfoWindow();
+
+                }
             }
 
             @Override
