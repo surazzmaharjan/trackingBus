@@ -23,6 +23,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.media.RingtoneManager;
@@ -66,7 +68,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -123,6 +127,11 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
     @BindView(R.id.bus_status_fab)
     FloatingActionButton statusBus;
+
+    Geocoder geocoder;
+    List<Address> addresses;
+    String address,city,state,substate,country,postalCode,feature,subcity,fare,subfare,premise;
+    String title;
 
     @Override
     protected void onStop() {
@@ -258,7 +267,6 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         if (startFromNotification) {
 
             Log.e(LOG_TAG, "Launched from notification");
-            //TODO: Application launched from notification and need to be handle effectively.
             String uId = FirebaseAuth.getInstance().getCurrentUser().getUid();
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Users").child("Driver").child(uId);
 
@@ -280,11 +288,39 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                                 passengerLocationLat = Double.parseDouble(map.get(0).toString());
                                 passengerLocationLon = Double.parseDouble(map.get(1).toString());
                                 LatLng passengerLatLng = new LatLng(passengerLocationLat, passengerLocationLon);
+
+
+                                geocoder = new Geocoder(DriverActivity.this, Locale.getDefault());
+
+
+
+                                try {
+                                    addresses = geocoder.getFromLocation(passengerLocationLat, passengerLocationLon, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+                                    address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                                    city = addresses.get(0).getLocality();
+                                    state = addresses.get(0).getAdminArea();
+                                    country = addresses.get(0).getCountryName();
+                                    substate = addresses.get(0).getSubAdminArea();
+                                    fare = addresses.get(0).getThoroughfare();
+                                    subfare = addresses.get(0).getThoroughfare();
+                                    premise = addresses.get(0).getPremises();
+
+                                    postalCode = addresses.get(0).getPostalCode();
+                                    subcity = addresses.get(0).getSubLocality();
+
+                                    feature = addresses.get(0).getFeatureName();
+                                    title = address +"-"+city+"-"+state;
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+
                                 if (mPassengerMarker!=null) mPassengerMarker.remove();
                                 mPassengerMarker = mMap.addMarker
                                         (new MarkerOptions()
                                                 .position(passengerLatLng)
-                                                .title("Passenger Here!")
+                                                .title(subcity+","+city+" (Passenger)")
                                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                                 Log.e(LOG_TAG, "Location of the passenger is " + map.get(0));
                             }
@@ -522,7 +558,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         Log.e(LOG_TAG, "Latitude and longitude are : " + latLng);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
 
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("driver_available");

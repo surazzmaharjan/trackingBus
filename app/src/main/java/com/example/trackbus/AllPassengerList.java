@@ -37,6 +37,7 @@ public class AllPassengerList extends AppCompatActivity {
     PassengerAdapter passengerAdapter;
 
     private SearchView searchView = null;
+    private SearchView passsearchView;
     private SearchView.OnQueryTextListener queryTextListener;
 
     @Override
@@ -47,7 +48,7 @@ public class AllPassengerList extends AppCompatActivity {
 
         Toolbar toolbar =(Toolbar)findViewById(R.id.passengerlisttoolbar);
         toolbar.setBackgroundColor(Color.TRANSPARENT);
-        toolbar.setTitle("Passenger List");
+        toolbar.setTitle("All Passengers");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -86,25 +87,12 @@ public class AllPassengerList extends AppCompatActivity {
         });
 
 
-    }
+        passsearchView        = (SearchView) findViewById(R.id.pass_search);
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-
-                MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.search_menu,menu);
-
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-
-        SearchManager searchManager = (SearchManager) this.getSystemService(Context.SEARCH_SERVICE);
-
-        if (searchItem != null) {
-            searchView = (SearchView) searchItem.getActionView();
-            searchView.setQueryHint("Search by workplace");
-        }
-        if (searchView != null) {
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(this.getComponentName()));
-            searchView.setQueryHint("Search by workplace");
+        if (passsearchView != null) {
+            SearchManager searchManager = (SearchManager) this.getSystemService(Context.SEARCH_SERVICE);
+            passsearchView.setSearchableInfo(searchManager.getSearchableInfo(this.getComponentName()));
+            passsearchView.setQueryHint("Search by Workplace");
 
             queryTextListener = new SearchView.OnQueryTextListener() {
                 @Override
@@ -120,26 +108,62 @@ public class AllPassengerList extends AppCompatActivity {
                     return true;
                 }
             };
-            searchView.setOnQueryTextListener(queryTextListener);
+            passsearchView.setOnQueryTextListener(queryTextListener);
         }
-        return super.onCreateOptionsMenu(menu);
     }
 
-
-
-
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_search:
-                // Not implemented here
-                return false;
-            default:
-                break;
-        }
-        searchView.setOnQueryTextListener(queryTextListener);
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//
+//                MenuInflater inflater = getMenuInflater();
+//        inflater.inflate(R.menu.search_menu,menu);
+//
+//        MenuItem searchItem = menu.findItem(R.id.action_search);
+//
+//        SearchManager searchManager = (SearchManager) this.getSystemService(Context.SEARCH_SERVICE);
+//
+//        if (searchItem != null) {
+//            searchView = (SearchView) searchItem.getActionView();
+//            searchView.setQueryHint("Search by Workplace");
+//        }
+//        if (searchView != null) {
+//            searchView.setSearchableInfo(searchManager.getSearchableInfo(this.getComponentName()));
+//            searchView.setQueryHint("Search by Workplace");
+//
+//            queryTextListener = new SearchView.OnQueryTextListener() {
+//                @Override
+//                public boolean onQueryTextChange(String newText) {
+//                    Log.i("onQueryTextChange", newText);
+//                    passengerAdapter.getFilter().filter(newText);
+//                    return false;
+//                }
+//                @Override
+//                public boolean onQueryTextSubmit(String query) {
+//                    Log.i("onQueryTextSubmit", query);
+//
+//                    return true;
+//                }
+//            };
+//            searchView.setOnQueryTextListener(queryTextListener);
+//        }
+//        return super.onCreateOptionsMenu(menu);
+//    }
+//
+//
+//
+//
+//
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case R.id.action_search:
+//                // Not implemented here
+//                return false;
+//            default:
+//                break;
+//        }
+//        searchView.setOnQueryTextListener(queryTextListener);
+//        return super.onOptionsItemSelected(item);
+//    }
 }

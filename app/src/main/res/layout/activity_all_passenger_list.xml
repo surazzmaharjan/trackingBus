@@ -8,11 +8,21 @@
     <include
         layout="@layout/profiletoolbar" android:id="@+id/passengerlisttoolbar"/>
 
+    <SearchView
+        android:id="@+id/pass_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Search by Workplace"
+        android:layout_below="@id/passengerlisttoolbar"
+        android:iconifiedByDefault="false">
+        <requestFocus />
+    </SearchView>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_passenger"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="10dp"
-        android:layout_below="@id/passengerlisttoolbar"
+        android:layout_below="@id/pass_search"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

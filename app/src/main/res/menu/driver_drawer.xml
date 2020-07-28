@@ -10,7 +10,7 @@
 
     <item
         android:id="@+id/passengerlistdrawer"
-        android:title="All Passenger"
+        android:title="All Passengers"
         android:icon="@drawable/ic_baseline_group_24"/>
 
         <item
