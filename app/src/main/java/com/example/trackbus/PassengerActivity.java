@@ -19,8 +19,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -97,8 +99,8 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
     @BindView(R.id.locate_bus_fab)
     FloatingActionButton locateBus;
 
-//    @BindView(R.id.locate_nearest_bus_fab)
-//    FloatingActionButton mLocateNearestBus;
+    @BindView(R.id.locate_nearest_bus_fab)
+    FloatingActionButton mLocateNearestBus;
 
 
 //    @BindView(R.id.passengerprofile)
@@ -117,7 +119,7 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
     private LatLng etaLocation;
     private LatLng passengerLocation;
     private LocationRequest mLocationRequest;
-    private int radiusLocateBusRequest = 1;
+    private int radiusLocateBusRequest = 20;
     private boolean busFound = false;
     private String busDriverKey = "";
     private ActionBarDrawerToggle mDrawerToggle;
@@ -135,6 +137,8 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
 
     DatabaseReference busRefStatus;
     String busnumberstatus;
+
+    private LatLng pickUpLocation;
 
     Geocoder geocoder;
     Geocoder geocoders;
@@ -278,6 +282,7 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
         }
 
         locateBus = (FloatingActionButton) findViewById(R.id.locate_bus_fab);
+        mLocateNearestBus = (FloatingActionButton) findViewById(R.id.locate_nearest_bus_fab);
 //        locateBus.setBackgroundColor(getResources().getColor(R.color.white));
 //        locateBus.setImageResource(R.drawable.activity);
 
@@ -289,18 +294,36 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
         spinner.getLayoutParams().height = 30;
 
 
-//        mLocateNearestBus.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("passengerRequestNearestBus");
-//                GeoFire geoFire = new GeoFire(reference);
-//                geoFire.setLocation(uid, new GeoLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
-//                passengerLocation = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
-//
+        mLocateNearestBus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("passengerRequestNearestBus");
+                GeoFire geoFire = new GeoFire(reference);
+                geoFire.setLocation(uid, new GeoLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
+                passengerLocation = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+
 //                getNearestBus();
-//            }
-//        });
+
+
+                try {
+                    pickUpLocation = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+//                    mMap.addMarker(new MarkerOptions().position(pickUpLocation).title("Pickup"));
+
+                    Toast.makeText(PassengerActivity.this, "Getting Details", Toast.LENGTH_SHORT).show();
+//                    mMap.moveCamera(CameraUpdateFactory.newLatLng(pickUpLocation));
+
+                    getNearestBus();
+                } catch (Exception e) {
+
+
+                    Toast.makeText( PassengerActivity.this, "Location Disabled", Toast.LENGTH_LONG).show();
+
+
+
+                }
+            }
+        });
 
 
         locateBus.setOnClickListener(new View.OnClickListener() {
@@ -347,7 +370,7 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
 
                                 try {
                                     addressess = geocoder.getFromLocation(buslat, buslon, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-//                                addresss = addressess.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                                addresss = addressess.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
                                     citys = addressess.get(0).getLocality();
                                     states = addressess.get(0).getAdminArea();
                                     countrys = addressess.get(0).getCountryName();
@@ -384,7 +407,7 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
 
                                         if (mBusMarker != null) mBusMarker.remove();
                                         mBusMarker = mMap.addMarker(new MarkerOptions().position(busLocationStatus)
-                                                .title(subcitys+","+citys)
+                                                .title(addresss)
                                                 .snippet("Bus is stuck in traffic jam")
                                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
                                         mBusMarker.showInfoWindow();
@@ -394,7 +417,7 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
                                         if (mBusMarker != null) mBusMarker.remove();
                                         mBusMarker = mMap.addMarker(new MarkerOptions()
                                                 .position(busLocationStatus)
-                                                .title(subcitys+","+citys)
+                                                .title(addresss)
                                                 .snippet("Bus is fully occupied")
                                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                                         mBusMarker.showInfoWindow();
@@ -405,7 +428,7 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
                                         if (mBusMarker != null) mBusMarker.remove();
                                         mBusMarker = mMap.addMarker(new MarkerOptions()
                                                 .position(busLocationStatus)
-                                                .title(subcitys+","+citys)
+                                                .title(addresss)
                                                 .snippet("Your bus is here")
                                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                                         mBusMarker.showInfoWindow();
@@ -415,7 +438,7 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
                                             mBusMarker.remove();
                                             mBusMarker = mMap.addMarker(new MarkerOptions()
                                                     .position(busLocationStatus)
-                                                    .title(subcitys+","+citys)
+                                                    .title(addresss)
                                                     .snippet("Your bus is here")
                                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                                         mBusMarker.showInfoWindow();
@@ -437,7 +460,7 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
 
                                         if (mBusMarker != null) mBusMarker.remove();
                                         mBusMarker = mMap.addMarker(new MarkerOptions().position(busLocationStatus)
-                                                .title(subcitys+","+citys)
+                                                .title(addresss)
                                                 .snippet("Bus is stuck in traffic jam")
                                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
 
@@ -447,7 +470,7 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
                                         if (mBusMarker != null) mBusMarker.remove();
                                         mBusMarker = mMap.addMarker(new MarkerOptions()
                                                 .position(busLocationStatus)
-                                                .title(subcitys+","+citys)
+                                                .title(addresss)
                                                 .snippet("Bus is fully occupied")
                                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
 
@@ -458,7 +481,7 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
                                         if (mBusMarker != null) mBusMarker.remove();
                                         mBusMarker = mMap.addMarker(new MarkerOptions()
                                                 .position(busLocationStatus)
-                                                .title(subcitys+","+citys)
+                                                .title(addresss)
                                                 .snippet("Your bus is here")
                                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                                         mBusMarker.showInfoWindow();
@@ -468,7 +491,7 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
                                             mBusMarker.remove();
                                             mBusMarker = mMap.addMarker(new MarkerOptions()
                                                     .position(busLocationStatus)
-                                                    .title(subcitys+","+citys)
+                                                    .title(addresss)
                                                     .snippet("Your bus is here")
                                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                                         mBusMarker.showInfoWindow();
@@ -576,7 +599,7 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
 
                             try {
                                 addresses = geocoders.getFromLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-//                             address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                             address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
                                 city = addresses.get(0).getLocality();
                                 state = addresses.get(0).getAdminArea();
                                 country = addresses.get(0).getCountryName();
@@ -599,7 +622,7 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
                         }
                         //create your custom title
                       Marker pmarker=  mMap.addMarker(new MarkerOptions().position(etaLocation)
-                                .title(subcity+","+city)
+                                .title(address)
                                 .snippet("I am here")
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
 
@@ -748,6 +771,9 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
                 if (!busFound) {
                     busFound = true;
                     busDriverKey = key;
+
+
+                    getDriverLocation();
                 }
             }
 
@@ -776,6 +802,100 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
             }
         });
     }
+
+
+
+
+    private Marker mDriverMarker;
+    private void getDriverLocation(){
+        DatabaseReference driverLocationRef = FirebaseDatabase.getInstance().getReference().child("driver_available").child(busDriverKey).child("l");
+        driverLocationRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    List<Object> map = (List<Object>)dataSnapshot.getValue();
+                    double locationLat = 0;
+                    double locationLng = 0;
+//                    mRequest.setText("Bus Found");
+                    //App will crash if value is null
+
+                    if(map.get(0)!=null){
+                        locationLat = Double.parseDouble(map.get(0).toString());
+                    }
+                    if(map.get(1)!=null){
+                        locationLng = Double.parseDouble(map.get(1).toString());
+                    }
+                    LatLng driverLatLng = new LatLng(locationLat,locationLng);
+
+
+                    if(mDriverMarker!=null){
+                        mDriverMarker.remove();
+                    }
+
+                    //Calculating distance
+                    Location loc1 = new Location(" ");
+                    loc1.setLatitude(pickUpLocation.latitude);
+                    loc1.setLongitude(pickUpLocation.longitude);
+
+                    Location loc2 = new Location(" ");
+                    loc2.setLatitude(driverLatLng.latitude);
+                    loc2.setLongitude(driverLatLng.longitude);
+
+                    float distance = loc1.distanceTo(loc2);
+                    String d = String.valueOf(distance);
+//                    displayNotification3(d);
+//                    mRequest.setText("Bus Found :" + String.valueOf(distance));
+
+                    int height = 100;
+                    int width = 100;
+                    BitmapDrawable bitmapdraw = (BitmapDrawable)getResources().getDrawable(R.drawable.bus_stop);
+                    Bitmap b = bitmapdraw.getBitmap();
+                    Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Geocoder.isPresent()) {
+                        geocoders = new Geocoder(getApplicationContext(), Locale.getDefault());
+
+
+
+                        try {
+                            addresses = geocoders.getFromLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+                             address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                            city = addresses.get(0).getLocality();
+                            state = addresses.get(0).getAdminArea();
+                            country = addresses.get(0).getCountryName();
+                            substate = addresses.get(0).getSubAdminArea();
+//                                fare = addresses.get(0).getThoroughfare();
+//                                subfare = addresses.get(0).getThoroughfare();
+//                                premise = addresses.get(0).getPremises();
+//
+//                                postalCode = addresses.get(0).getPostalCode();
+                            subcity = addresses.get(0).getSubLocality();
+
+                            feature = addresses.get(0).getFeatureName();
+//                                title = address + "-" + city + "-" + state;
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+
+                    mDriverMarker = mMap.addMarker(new MarkerOptions().position(driverLatLng)
+                            .title(address)
+                            .snippet("Nearest Bus")
+                            .icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+                    mDriverMarker.showInfoWindow();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+                Toast.makeText(PassengerActivity.this, databaseError.toString(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
 
     /**
      * Manipulates the map once available.
@@ -850,7 +970,7 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         Log.e(LOG_TAG, "Latitude and longitude are : " + latLng);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
     }
 
@@ -909,6 +1029,21 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
         notificationManagerCompat.notify(1, notification);
     }
 
+    public void displayNotification3(String distance) {
+        Notification notification = new NotificationCompat
+                .Builder(this, BusTrackNotification.Logout_Channel)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle("Information")
+                .setLargeIcon(BitmapFactory.decodeResource(getBaseContext().getResources(), R.drawable.ic_launcher_foreground))
+                .setContentText("Bus found :"+distance)
+                .setAutoCancel(true)
+                .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400})
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .build();
+
+
+        notificationManagerCompat.notify(1, notification);
+    }
 
 
     private Location getCurrentLocation() {

@@ -64,6 +64,19 @@
                 android:text="Profile"
                 android:visibility="gone"/>
 
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/locate_nearest_passenger_fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+                android:layout_marginBottom="150dp"
+                android:background="@color/textColor"
+                app:backgroundTint="@color/textColor"
+                android:src="@drawable/ic_baseline_near_me_24"
+                android:layout_marginRight="4dp"
+                />
+
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/bus_status_fab"
                 android:layout_width="wrap_content"

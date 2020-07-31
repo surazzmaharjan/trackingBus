@@ -22,7 +22,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -39,11 +41,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.trackbus.model.User;
 import com.example.trackbus.service.BusTrackNotification;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryEventListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
@@ -69,7 +74,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import org.xmlpull.v1.sax2.Driver;
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -85,8 +93,15 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     @BindView(R.id.logout_btn_driver)
     Button mLogout;
 
+    private boolean passengerFound = false;
+    private String passengerKey = "";
 //    @BindView(R.id.profile)
 //    Button mProfile;
+
+    int i;
+
+    @BindView(R.id.locate_nearest_passenger_fab)
+    FloatingActionButton mLocateNearestPassenger;
 
     @BindView(R.id.link_bus)
     Button mLinkBus;
@@ -102,6 +117,8 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     public static final String LOG_TAG = DriverActivity.class.getSimpleName();
     private static final int RC_PER = 2;
 
+    private int radiusPassengerRequest = 20;
+
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastKnownLocation;
@@ -116,9 +133,10 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     private Marker mPassengerMarker;
     private TextView useremail ,userfullname;
     private ImageView profileimage;
-
+    private LatLng driverLocation;
     CoordinatorLayout coordinatorLayout;
     private FirebaseAuth mAuth;
+    int counterbutton =1;
 
      NotificationManager mNotificationManager;
 
@@ -129,14 +147,15 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     @BindView(R.id.bus_status_fab)
     FloatingActionButton statusBus;
 
-    private Geocoder geocoder;
+    private Geocoder geocoder,geocoders;
     private List<Address> addresses;
     private List<Address> addressess;
     private String address,city,state,substate,country,postalCode,feature,subcity,fare,subfare,premise;
     private String addresss,citys,states,substates,countrys,postalCodes,features,subcitys,fares,subfares,premises;
-
+    String nearestfname;
     String title;
     Marker busStatusMaker;
+    List<String> passengerNearby = new ArrayList<>();
 
     @Override
     protected void onStop() {
@@ -209,6 +228,36 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
 
         statusBus = (FloatingActionButton) findViewById(R.id.bus_status_fab);
+        mLocateNearestPassenger = (FloatingActionButton) findViewById(R.id.locate_nearest_passenger_fab);
+
+
+        mLocateNearestPassenger.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                driverLocation = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+
+                if(counterbutton==1){
+                    counterbutton++;
+                    try {
+                        Toast.makeText(DriverActivity.this, "Getting Details..", Toast.LENGTH_SHORT).show();
+
+                        getNearestPassenger();
+                    } catch (Exception e) {
+
+                        Toast.makeText( DriverActivity.this, "Location Disabled", Toast.LENGTH_LONG).show();
+
+
+                    }
+                }else{
+                    Log.d("number",counterbutton+"");
+                    Toast.makeText(DriverActivity.this, "Available Number Of Passengers: "+String.valueOf(passengerNearby.size()), Toast.LENGTH_SHORT).show();
+                }
+
+
+            }
+        });
+
 
         statusBus.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -300,7 +349,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
                                     try {
                                         addresses = geocoder.getFromLocation(passengerLocationLat, passengerLocationLon, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-//                                    address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                                        address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
                                         city = addresses.get(0).getLocality();
                                         state = addresses.get(0).getAdminArea();
                                         country = addresses.get(0).getCountryName();
@@ -324,7 +373,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                                 mPassengerMarker = mMap.addMarker
                                         (new MarkerOptions()
                                                 .position(passengerLatLng)
-                                                .title(subcity+","+city)
+                                                .title(address)
                                                 .snippet("Your passenger")
                                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                                 Log.e(LOG_TAG, "Location of the passenger is " + map.get(0));
@@ -564,7 +613,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         Log.e(LOG_TAG, "Latitude and longitude are : " + latLng);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
 //        FirebaseUser mFirebaseUsers = mAuth.getCurrentUser();
 
@@ -588,7 +637,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
             try {
                 addressess = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-////            addresss = addressess.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                addresss = addressess.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
                 citys = addressess.get(0).getLocality();
                 states = addressess.get(0).getAdminArea();
                 countrys = addressess.get(0).getCountryName();
@@ -655,7 +704,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                 if (isStatus.equals("traffic_jam")) {
                     if (busStatusMaker != null) busStatusMaker.remove();
                     busStatusMaker= mMap.addMarker(new MarkerOptions().position(driverLoct)
-                            .title(subcitys+","+citys)
+                            .title(addresss)
                             .snippet("My bus is stuck in traffic jam")
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
                     busStatusMaker.showInfoWindow();
@@ -665,7 +714,8 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     if (busStatusMaker != null) busStatusMaker.remove();
                     busStatusMaker= mMap.addMarker(new MarkerOptions()
                             .position(driverLoct)
-                            .title(subcitys+","+citys)
+//                            .title(subcitys+","+citys)
+                            .title(addresss)
                             .snippet("My bus is fully occupied")
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                     busStatusMaker.showInfoWindow();
@@ -675,7 +725,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     if (busStatusMaker != null) busStatusMaker.remove();
                     busStatusMaker = mMap.addMarker(new MarkerOptions()
                             .position(driverLoct)
-                            .title(subcitys+","+citys)
+                            .title(addresss)
                             .snippet("My bus is here")
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                     busStatusMaker.showInfoWindow();
@@ -685,7 +735,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     if (busStatusMaker != null) busStatusMaker.remove();
                     busStatusMaker =mMap.addMarker(new MarkerOptions()
                                 .position(driverLoct)
-                                .title(subcitys+","+citys)
+                                 .title(addresss)
                                 .snippet("My bus is here")
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                     busStatusMaker.showInfoWindow();
@@ -745,6 +795,169 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, RC_PER);
     }
 
+    private Marker mPassegerMarker;
+
+    private void getNearestPassenger(){
+        DatabaseReference nearestBus = FirebaseDatabase.getInstance().getReference().child("passengerRequestNearestBus");
+        GeoFire geoFire = new GeoFire(nearestBus);
+        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(driverLocation.latitude, driverLocation.longitude), radiusPassengerRequest);
+        geoQuery.removeAllListeners();
+        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+            @Override
+            public void onKeyEntered(String key, GeoLocation location) {
+//                if (!passengerFound) {
+//                    passengerFound = true;
+                    passengerKey = key;
+
+                            passengerNearby.add(key);
+
+//                    Log.d("Number of passengers", String.valueOf(passengerNearby.size()));
+                    Toast.makeText(DriverActivity.this, "Available Number Of Passengers: "+String.valueOf(passengerNearby.size()), Toast.LENGTH_SHORT).show();
+
+                    getPassengerLocation();
+//                }
+            }
+
+            @Override
+            public void onKeyExited(String key) {
+                passengerNearby.remove(key);
+
+            }
+
+            @Override
+            public void onKeyMoved(String key, GeoLocation location) {
+
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+//                if (!passengerFound) {
+//                    radiusPassengerRequest++;
+//                    getNearestPassenger();
+//                }
+
+                for ( i = 0; i<passengerNearby.size(); i++) {
+//                    Log.i("Key: ", passengerNearby.get(i));
+                    final DatabaseReference passengerLocationRef = FirebaseDatabase.getInstance().getReference().child("passengerRequestNearestBus").child(passengerNearby.get(i)).child("l");
+                    DatabaseReference passengerDetails = FirebaseDatabase.getInstance().getReference().child("Users_Detail").child(passengerNearby.get(i));
+
+                     String namepassenger;
+                    passengerDetails.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            if (dataSnapshot.exists()) {
+
+                                nearestfname = dataSnapshot.child("fullName").getValue(String.class);
+
+//                                namepassenger = nearestfname;
+                                Log.d("name",nearestfname);
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+
+
+
+                    passengerLocationRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Log.i("Key: ",  dataSnapshot.getValue().toString());
+
+
+                            if (dataSnapshot.exists()) {
+                                List<Object> map = (List<Object>) dataSnapshot.getValue();
+                                double locationLat = 0;
+                                double locationLng = 0;
+                                //                    mRequest.setText("Bus Found");
+                                //App will crash if value is null
+
+                                if (map.get(0) != null) {
+                                    locationLat = Double.parseDouble(map.get(0).toString());
+                                }
+                                if (map.get(1) != null) {
+                                    locationLng = Double.parseDouble(map.get(1).toString());
+                                }
+                                LatLng driverLatLng = new LatLng(locationLat, locationLng);
+
+
+
+
+
+                                int height = 100;
+                                int width = 100;
+                                BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.passenger_location);
+                                Bitmap b = bitmapdraw.getBitmap();
+                                Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Geocoder.isPresent()) {
+                                    geocoders = new Geocoder(getApplicationContext(), Locale.getDefault());
+
+
+                                    try {
+                                        addresses = geocoders.getFromLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+                                        address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                                        city = addresses.get(0).getLocality();
+                                        state = addresses.get(0).getAdminArea();
+                                        country = addresses.get(0).getCountryName();
+                                        substate = addresses.get(0).getSubAdminArea();
+                                        //                                fare = addresses.get(0).getThoroughfare();
+                                        //                                subfare = addresses.get(0).getThoroughfare();
+                                        //                                premise = addresses.get(0).getPremises();
+                                        //
+                                        //                                postalCode = addresses.get(0).getPostalCode();
+                                        subcity = addresses.get(0).getSubLocality();
+
+                                        feature = addresses.get(0).getFeatureName();
+                                        //                                title = address + "-" + city + "-" + state;
+
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+
+
+                                }
+
+                                mPassegerMarker= mMap.addMarker(new MarkerOptions().position(driverLatLng)
+                                        .title(address)
+                                        .snippet("Nearest Passenger Name: "+nearestfname)
+                                        .icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+                                mPassegerMarker.showInfoWindow();
+                            }
+
+
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                            Toast.makeText(DriverActivity.this, databaseError.toString(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+
+
+                }
+
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+
+            }
+        });
+    }
+
+    private  void getPassengerLocation(){
+
+
+    }
 
     public void displayNotification() {
         Notification notification = new NotificationCompat

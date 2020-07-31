@@ -169,6 +169,7 @@ public class ProfileActivity extends AppCompatActivity {
             String fname, cemail, profession, workplace, phone;
 
             FirebaseUser fireusers = mAuth.getCurrentUser();
+
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot keyId: dataSnapshot.getChildren()) {
