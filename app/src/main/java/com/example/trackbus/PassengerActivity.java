@@ -297,6 +297,8 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
         mLocateNearestBus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+
                 String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("passengerRequestNearestBus");
                 GeoFire geoFire = new GeoFire(reference);
@@ -310,7 +312,7 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
                     pickUpLocation = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
 //                    mMap.addMarker(new MarkerOptions().position(pickUpLocation).title("Pickup"));
 
-                    Toast.makeText(PassengerActivity.this, "Getting Details", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PassengerActivity.this, "Getting Details..", Toast.LENGTH_SHORT).show();
 //                    mMap.moveCamera(CameraUpdateFactory.newLatLng(pickUpLocation));
 
                     getNearestBus();
@@ -936,6 +938,16 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
         mGoogleApiClient.connect();
     }
 
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//
+//        if(mMap != null){
+//            mMap.clear();
+//
+//            // add the markers just like how you did the first time
+//        }
+//    }
     @Override
     public void onConnected(@Nullable Bundle bundle) {
 

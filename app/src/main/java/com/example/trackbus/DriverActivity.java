@@ -157,6 +157,8 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     Marker busStatusMaker;
     List<String> passengerNearby = new ArrayList<>();
 
+    String requestfname;
+
 
     @Override
     protected void onStop() {
@@ -171,6 +173,16 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         mGoogleApiClient.connect();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if(mMap != null){
+            mMap.clear();
+
+            // add the markers just like how you did the first time
+        }
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
@@ -235,6 +247,11 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         mLocateNearestPassenger.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(mMap != null){
+                    mMap.clear();
+
+                    // add the markers just like how you did the first time
+                }
                 String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 driverLocation = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
 
@@ -328,11 +345,10 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
         Boolean startFromNotification = getIntent().getBooleanExtra(getString(R.string.launched_via_notification), false);
         if (startFromNotification) {
-
+//            mMap.clear();
             Log.e(LOG_TAG, "Launched from notification");
             String uId = FirebaseAuth.getInstance().getCurrentUser().getUid();
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Users").child("Driver").child(uId);
-
             reference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -342,6 +358,22 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
 
                         Log.e(LOG_TAG, "Passenger id is " + passengerId);
+                        DatabaseReference passengerLocationDetails = FirebaseDatabase.getInstance().getReference().child("Users_Detail").child(passengerId);
+                        passengerLocationDetails.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot detailsdataSnapshot) {
+                                 if (detailsdataSnapshot.exists()) {
+
+                                     requestfname = detailsdataSnapshot.child("fullName").getValue(String.class);
+                                    Log.d("name", requestfname);
+                                    }
+                                }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
 
                         DatabaseReference passengerLocation = FirebaseDatabase.getInstance().getReference().child("Users").child("Passengers").child(passengerId).child(passengerId).child("l");
                         passengerLocation.addValueEventListener(new ValueEventListener() {
@@ -383,7 +415,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                                         (new MarkerOptions()
                                                 .position(passengerLatLng)
                                                 .title(address)
-                                                .snippet("Your passenger")
+                                                .snippet("Your passenger name : "+requestfname)
                                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                                 Log.e(LOG_TAG, "Location of the passenger is " + map.get(0));
                                 mPassengerMarker.showInfoWindow();
@@ -850,9 +882,6 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
                     final DatabaseReference passengerDetails = FirebaseDatabase.getInstance().getReference().child("Users_Detail").child(passengerNearby.get(i));
                       DatabaseReference passengerLocationRef = FirebaseDatabase.getInstance().getReference().child("passengerRequestNearestBus").child(passengerNearby.get(i)).child("l");
-
-
-
 
 
                     passengerLocationRef.addValueEventListener(new ValueEventListener() {
