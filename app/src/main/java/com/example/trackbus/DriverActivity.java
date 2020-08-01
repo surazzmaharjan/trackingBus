@@ -117,7 +117,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     public static final String LOG_TAG = DriverActivity.class.getSimpleName();
     private static final int RC_PER = 2;
 
-    private int radiusPassengerRequest = 20;
+    private int radiusPassengerRequest = 2;
 
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
@@ -150,12 +150,13 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     private Geocoder geocoder,geocoders;
     private List<Address> addresses;
     private List<Address> addressess;
-    private String address,city,state,substate,country,postalCode,feature,subcity,fare,subfare,premise;
+    private String caddress,address,city,state,substate,country,postalCode,feature,subcity,fare,subfare,premise;
     private String addresss,citys,states,substates,countrys,postalCodes,features,subcitys,fares,subfares,premises;
     String nearestfname;
     String title;
     Marker busStatusMaker;
     List<String> passengerNearby = new ArrayList<>();
+
 
     @Override
     protected void onStop() {
@@ -251,7 +252,15 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     }
                 }else{
                     Log.d("number",counterbutton+"");
-                    Toast.makeText(DriverActivity.this, "Available Number Of Passengers: "+String.valueOf(passengerNearby.size()), Toast.LENGTH_SHORT).show();
+                    if(passengerNearby.size()==0){
+                        Toast.makeText(DriverActivity.this, "No Passenger Nearby", Toast.LENGTH_SHORT).show();
+
+                    }else{
+                        Toast.makeText(DriverActivity.this, "Available Number Of Passengers: "+String.valueOf(passengerNearby.size()), Toast.LENGTH_SHORT).show();
+
+                    }
+
+
                 }
 
 
@@ -615,15 +624,15 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
-//        FirebaseUser mFirebaseUsers = mAuth.getCurrentUser();
+        FirebaseUser mFirebaseUsers = mAuth.getCurrentUser();
 
-//        if(mFirebaseUsers != null) {
+        if(mFirebaseUsers != null) {
             String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("driver_available");
             GeoFire geoFire = new GeoFire(reference);
             geoFire.setLocation(uid, new GeoLocation(location.getLatitude(), location.getLongitude()));
-//        }
+        }
 
        final LatLng driverLoct= new LatLng(location.getLatitude(), location.getLongitude());
 
@@ -808,13 +817,12 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 //                if (!passengerFound) {
 //                    passengerFound = true;
                     passengerKey = key;
-
-                            passengerNearby.add(key);
-
+                    passengerNearby.add(key);
+//                        if(key !=null) {
 //                    Log.d("Number of passengers", String.valueOf(passengerNearby.size()));
-                    Toast.makeText(DriverActivity.this, "Available Number Of Passengers: "+String.valueOf(passengerNearby.size()), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(DriverActivity.this, "Available Number Of Passengers: " + String.valueOf(passengerNearby.size()), Toast.LENGTH_SHORT).show();
 
-                    getPassengerLocation();
+//                        }
 //                }
             }
 
@@ -836,99 +844,92 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 //                    getNearestPassenger();
 //                }
 
+
                 for ( i = 0; i<passengerNearby.size(); i++) {
 //                    Log.i("Key: ", passengerNearby.get(i));
-                    final DatabaseReference passengerLocationRef = FirebaseDatabase.getInstance().getReference().child("passengerRequestNearestBus").child(passengerNearby.get(i)).child("l");
-                    DatabaseReference passengerDetails = FirebaseDatabase.getInstance().getReference().child("Users_Detail").child(passengerNearby.get(i));
 
-                     String namepassenger;
-                    passengerDetails.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
+                    final DatabaseReference passengerDetails = FirebaseDatabase.getInstance().getReference().child("Users_Detail").child(passengerNearby.get(i));
+                      DatabaseReference passengerLocationRef = FirebaseDatabase.getInstance().getReference().child("passengerRequestNearestBus").child(passengerNearby.get(i)).child("l");
 
-                            if (dataSnapshot.exists()) {
-
-                                nearestfname = dataSnapshot.child("fullName").getValue(String.class);
-
-//                                namepassenger = nearestfname;
-                                Log.d("name",nearestfname);
-
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
 
 
 
 
                     passengerLocationRef.addValueEventListener(new ValueEventListener() {
                         @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            Log.i("Key: ",  dataSnapshot.getValue().toString());
+                        public void onDataChange(final DataSnapshot sdataSnapshot) {
+                            Log.i("Key: ",  sdataSnapshot.getValue().toString());
 
 
-                            if (dataSnapshot.exists()) {
-                                List<Object> map = (List<Object>) dataSnapshot.getValue();
-                                double locationLat = 0;
-                                double locationLng = 0;
-                                //                    mRequest.setText("Bus Found");
-                                //App will crash if value is null
+                            passengerDetails.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                if (map.get(0) != null) {
-                                    locationLat = Double.parseDouble(map.get(0).toString());
-                                }
-                                if (map.get(1) != null) {
-                                    locationLng = Double.parseDouble(map.get(1).toString());
-                                }
-                                LatLng driverLatLng = new LatLng(locationLat, locationLng);
+                                    if (dataSnapshot.exists()) {
+
+                                         nearestfname = dataSnapshot.child("fullName").getValue(String.class);
+                                        Log.d("name",nearestfname);
 
 
 
+                                        if (sdataSnapshot.exists()) {
+                                            List<Object> map = (List<Object>) sdataSnapshot.getValue();
+                                            double locationLat = 0;
+                                            double locationLng = 0;
+                                            //                    mRequest.setText("Bus Found");
+                                            //App will crash if value is null
+
+                                            if (map.get(0) != null) {
+                                                locationLat = Double.parseDouble(map.get(0).toString());
+                                            }
+                                            if (map.get(1) != null) {
+                                                locationLng = Double.parseDouble(map.get(1).toString());
+                                            }
+                                            LatLng driverLatLng = new LatLng(locationLat, locationLng);
 
 
-                                int height = 100;
-                                int width = 100;
-                                BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.passenger_location);
-                                Bitmap b = bitmapdraw.getBitmap();
-                                Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Geocoder.isPresent()) {
-                                    geocoders = new Geocoder(getApplicationContext(), Locale.getDefault());
 
 
-                                    try {
-                                        addresses = geocoders.getFromLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-                                        address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
-                                        city = addresses.get(0).getLocality();
-                                        state = addresses.get(0).getAdminArea();
-                                        country = addresses.get(0).getCountryName();
-                                        substate = addresses.get(0).getSubAdminArea();
-                                        //                                fare = addresses.get(0).getThoroughfare();
-                                        //                                subfare = addresses.get(0).getThoroughfare();
-                                        //                                premise = addresses.get(0).getPremises();
-                                        //
-                                        //                                postalCode = addresses.get(0).getPostalCode();
-                                        subcity = addresses.get(0).getSubLocality();
 
-                                        feature = addresses.get(0).getFeatureName();
-                                        //                                title = address + "-" + city + "-" + state;
+                                            int height = 50;
+                                            int width = 50;
+                                            BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.passenger_location);
+                                            Bitmap b = bitmapdraw.getBitmap();
+                                            Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Geocoder.isPresent()) {
+                                                geocoders = new Geocoder(getApplicationContext(), Locale.getDefault());
 
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
+
+                                                try {
+                                                    addresses = geocoders.getFromLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+                                                    caddress = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+
+
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                }
+
+
+                                            }
+
+
+                                            mPassegerMarker= mMap.addMarker(new MarkerOptions().position(driverLatLng)
+                                                    .title(caddress)
+                                                    .snippet("Nearest Passenger Name: "+nearestfname)
+                                                    .icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+                                            mPassegerMarker.showInfoWindow();
+                                        }
+
+
+
                                     }
-
-
                                 }
 
-                                mPassegerMarker= mMap.addMarker(new MarkerOptions().position(driverLatLng)
-                                        .title(address)
-                                        .snippet("Nearest Passenger Name: "+nearestfname)
-                                        .icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
-                                mPassegerMarker.showInfoWindow();
-                            }
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
 
 
 
@@ -945,6 +946,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
                 }
 
+
             }
 
             @Override
@@ -954,10 +956,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         });
     }
 
-    private  void getPassengerLocation(){
 
-
-    }
 
     public void displayNotification() {
         Notification notification = new NotificationCompat

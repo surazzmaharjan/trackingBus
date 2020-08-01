@@ -846,8 +846,8 @@ public class PassengerActivity extends AppCompatActivity implements OnMapReadyCa
 //                    displayNotification3(d);
 //                    mRequest.setText("Bus Found :" + String.valueOf(distance));
 
-                    int height = 100;
-                    int width = 100;
+                    int height = 80;
+                    int width = 80;
                     BitmapDrawable bitmapdraw = (BitmapDrawable)getResources().getDrawable(R.drawable.bus_stop);
                     Bitmap b = bitmapdraw.getBitmap();
                     Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
