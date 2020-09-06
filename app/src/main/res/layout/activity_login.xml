@@ -50,7 +50,6 @@
                     android:layout_marginTop="35dp"
                     android:paddingTop="@dimen/padding_large"
                     android:textColorHint="#000000">
-
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/textInputEditTextEmail"
                         android:layout_width="match_parent"

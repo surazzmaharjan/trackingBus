@@ -228,10 +228,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
 
 
-        mProgress = new ProgressDialog(LoginActivity.this, R.style.AppTheme_Dark_Dialog);
-        mProgress.setMessage("Authenticating...");
-        mProgress.setCancelable(false);
-        mProgress.setIndeterminate(true);
+//        mProgress = new ProgressDialog(LoginActivity.this, R.style.AppTheme_Dark_Dialog);
+//        mProgress.setMessage("Authenticating...");
+//        mProgress.setCancelable(false);
+//        mProgress.setIndeterminate(true);
 
 
         mAuth = FirebaseAuth.getInstance();
@@ -273,7 +273,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         switch (view.getId()) {
             case R.id.appCompatButtonLogin:
 
-                mProgress.show();
+//                mProgress.show();
                 String email =textInputEditTextEmail.getText().toString();
                 String password =textInputEditTextPassword.getText().toString();
 
@@ -281,7 +281,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                        "Enter a email")) {
                     return;
                 }
-                if (!inputValidation.isInputEditTextEmail(textInputEditTextEmail, textInputLayoutEmail, "Ente a valid email")) {
+                if (!inputValidation.isInputEditTextEmail(textInputEditTextEmail, textInputLayoutEmail, "Enter a valid email")) {
                     return;
                 }
                 if (!inputValidation.isInputEditTextFilled(textInputEditTextPassword, textInputLayoutPassword, "Enter a password")) {
